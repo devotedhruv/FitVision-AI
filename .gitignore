@@ -1,0 +1,125 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.coverage
+*.lcov
+doc/api/
+flutter_*.png
+.metadata
+
+# Android / Gradle
+**/.gradle/
+**/local.properties
+**/key.properties
+**/*.jks
+**/*.keystore
+**/captures/
+**/.cxx/
+**/.externalNativeBuild/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+htmlcov/
+.coverage
+.coverage.*
+*.egg-info/
+.eggs/
+dist/
+wheelhouse/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment and secrets (keep the template)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+google-services.json
+GoogleService-Info.plist
+
+# Supabase local runtime/generated data
+.supabase/
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+
+# Operating systems
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs, caches, and temporary files
+*.log
+logs/
+.cache/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Test/report outputs
+test-results/
+reports/
+allure-results/
+allure-report/
+.nyc_output/
+
+# Model experiments and large generated artifacts
+artifacts/
+checkpoints/
+runs/
+wandb/
+mlruns/
+*.tflite
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.h5
+
+# Local containers and tooling
+.docker/
+docker-compose.override.yml
+
+# Do not ignore docs/ or docs/diagrams/*.png: Phase 0 artifacts are versioned.
