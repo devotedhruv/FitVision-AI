@@ -1,17 +1,29 @@
-# fitvision_ai
+# FitVision AI Mobile
 
-A new Flutter project.
+Android-first Flutter client for FitVision AI. Phase 2 provides a complete
+mock-data mobile experience without camera, GPS, authentication, or backend
+business integration.
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run \
+  --dart-define=APP_ENV=development \
+  --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
 
-A few resources to get you started if this is your first Flutter project:
+The Phase 2 screens do not require the API to be running. The API configuration
+and diagnostic foundation from Phase 1 remain available in the codebase.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Verify
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+```
+
+See the repository-level
+[Phase 2 implementation guide](../../docs/phases/phase-02-core-mobile-experience/implementation-guide.md)
+for routes, architecture, limitations, and the planned Phase 3 boundaries.

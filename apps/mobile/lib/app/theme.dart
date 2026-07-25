@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fitvision_ai/core/design_system/app_colors.dart';
 
 abstract final class AppTheme {
-  static const seedColor = Color(0xFF176B5B);
+  static const seedColor = AppColors.primary;
   static final light = _build(Brightness.light);
   static final dark = _build(Brightness.dark);
 
@@ -33,6 +34,16 @@ abstract final class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        indicatorColor: scheme.primaryContainer,
+      ),
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
       ),
     );
   }
