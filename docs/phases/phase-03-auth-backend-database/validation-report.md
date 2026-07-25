@@ -37,3 +37,42 @@ No real Supabase credentials were present, so real registration, confirmation,
 token refresh, and database-backed endpoint flows remain environment validation
 items. Unit/API tests use fakes and local signing keys and never contact
 Supabase.
+
+## Live environment closure validation — 2026-07-25
+
+The project owner subsequently supplied an authorized Supabase development
+project and a physical Android device. The previously deferred environment
+checks were repeated with the following results:
+
+- The live Supabase database is at Alembic revision `20260725_0002 (head)`.
+  `alembic check` reports no new upgrade operations.
+- All six application tables have PostgreSQL row-level security enabled.
+  The expected 21 ownership and exercise-catalogue policies are present.
+- A disposable local PostgreSQL 17 database accepted both Alembic migrations
+  from an empty state, including the exercise seed revision.
+- Backend format and lint checks passed. The full backend suite passed with
+  `29 passed` when supplied an explicitly isolated test target.
+- Flutter analysis passed with no issues and all 27 Flutter tests passed.
+- The configured Android debug APK built successfully and was installed on the
+  physical Android 12 device.
+- A real email-authenticated Supabase session successfully loaded the Profile
+  and Exercises screens on the connected Android 12 device through FastAPI.
+- The live profile response returned the authenticated user's profile, and the
+  exercise catalogue returned the seeded exercise definitions.
+- A real Supabase refresh-token exchange issued a new ES256 access token. The
+  FastAPI `/api/v1/auth/session` endpoint accepted that refreshed token and
+  returned the expected authenticated email, role, and expiry without exposing
+  either token.
+- Real logout cleared the mobile session and routed the application back to
+  the Sign in screen.
+- The user then signed in again on-device without exposing credentials. The
+  application restored the authenticated route, reloaded all five seeded
+  exercises, and reloaded the same user-scoped profile successfully.
+
+The Android device used `adb reverse tcp:8000 tcp:8000`; therefore these live
+API checks require the development backend and USB reverse tunnel. This is a
+development topology constraint, not a standalone production deployment.
+
+With the live closure checks above, the Phase 3 authentication, backend,
+database, migration, RLS, integration, refresh, logout, and physical-device
+acceptance scope is complete.
