@@ -2,11 +2,11 @@
 
 ## ADR-001 — Android-First Flutter Client
 
-**Decision:** Generate only Android in Phase 1 while keeping portable Dart boundaries. **Rationale:** Phase 0 identifies Android as the supported initial platform; limiting generated platforms reduces unsupported configuration and testing. **Status:** Accepted, implementation blocked by missing Flutter SDK.
+**Decision:** Generate only Android in Phase 1 while keeping portable Dart boundaries. **Rationale:** Phase 0 identifies Android as the supported initial platform; limiting generated platforms reduces unsupported configuration and testing. **Status:** Implemented.
 
 ## ADR-002 — Material 3 Foundation
 
-**Decision:** Use centralized Material 3 light/dark themes with system mode. **Rationale:** It supplies accessible platform-consistent primitives without prematurely fixing final branding. **Status:** Accepted, implementation pending mobile generation.
+**Decision:** Use centralized Material 3 light/dark themes with system mode. **Rationale:** It supplies accessible platform-consistent primitives without prematurely fixing final branding. **Status:** Implemented.
 
 ## ADR-003 — Layered Foundation, Feature-First from Phase 2
 
@@ -34,7 +34,7 @@
 
 ## ADR-009 — Debug-Only Cleartext HTTP
 
-**Decision:** Permit HTTP only in Android debug configuration for emulator/ADB-reverse development; production expects HTTPS. **Rationale:** Local TLS adds setup cost, but global cleartext weakens transport security. **Status:** Accepted, Android manifest pending genuine Flutter generation.
+**Decision:** Permit HTTP only in Android debug configuration for emulator/ADB-reverse development; production expects HTTPS. **Rationale:** Local TLS adds setup cost, but global cleartext weakens transport security. **Status:** Implemented through the debug-only Android manifest.
 
 ## ADR-010 — Database and Authentication Deferred
 
@@ -44,3 +44,6 @@
 
 **Decision:** Export both `create_app(settings)` and `app`, with no Uvicorn startup during import. **Rationale:** Tests can inject deterministic settings, ASGI servers can import the application normally, and module imports have no network/process side effects.
 
+## ADR-012 — Java Launcher for the Phase 1 Shell
+
+**Decision:** Use an equivalent Java `FlutterActivity` launcher for the generated shell. **Rationale:** The generated one-line Kotlin launcher repeatedly stalled at `compileDebugKotlin` in this environment. Phase 1 contains no native logic; Kotlin will be introduced with an explicitly validated configuration when the MediaPipe bridge begins. This avoids pretending native integration exists now.

@@ -1,8 +1,12 @@
 # FitVision AI
 
-FitVision AI is an Android-first mobile-system project for future on-device exercise pose monitoring and GPS running tracking. The current repository contains the complete Phase 0 requirements and an operational Phase 1 FastAPI foundation.
+FitVision AI is an Android-first mobile-system project for future on-device exercise pose monitoring and GPS running tracking. The repository contains the complete Phase 0 requirements plus implemented Flutter and FastAPI Phase 1 foundations.
 
-> **Current status: Phase 1 partially complete. The FastAPI foundation is operational; Flutter/Android foundation work is blocked because Flutter, Dart, ADB, and Android tooling are unavailable in the execution environment.**
+**Phase 0 completed — planning and requirements documented. Application implementation has not started.**
+
+The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
+
+> **Current status: Phase 1 implementation is complete and its Flutter/FastAPI tests and static checks pass. Final Android APK validation remains blocked by an incomplete Android command-line-tools installation and a Gradle compile stall.**
 
 The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
 
@@ -39,8 +43,8 @@ Camera frames are processed on the device. Flutter use cases coordinate the nati
 
 ## Phase Roadmap
 
-1. **Phase 0 — Planning and requirement analysis (complete):** scope, traceable requirements, acceptance baseline, risks, and diagrams.
-2. **Phase 1 — Project foundation (blocked / partial):** FastAPI, environment configuration, tests, and health contract are complete; Flutter generation and mobile validation remain blocked.
+1. **Phase 0 — Planning and requirement analysis (complete):** scope, traceable requirements, acceptance baseline, risks, and diagrams. At this milestone, application implementation had not started.
+2. **Phase 1 — Project foundation (validation pending):** Flutter and FastAPI foundations, environment configuration, health contract, tests, and analysis are complete; debug APK validation remains unresolved.
 3. **Phase 2 — UI/UX, design system, application navigation and mock-data screens:** begins only after Phase 1 mobile acceptance checks pass.
 4. **Later implementation phases:** camera/native pose integration, exercise rules, running, authentication/data, history/analytics, validation, and delivery remain subject to the Phase 0 requirements and future phase plans.
 
@@ -61,17 +65,23 @@ fitvision-ai/
 │       ├── tests/
 │       ├── pyproject.toml
 │       └── uv.lock
+├── apps/
+│   └── mobile/
+│       ├── android/
+│       ├── assets/
+│       ├── lib/
+│       ├── test/
+│       ├── pubspec.yaml
+│       └── pubspec.lock
 ├── .env.example
 ├── .gitignore
 └── README.md
 ```
 
-`apps/mobile/` is intentionally absent: the required `flutter create` command could not run, and generated Android files have not been fabricated.
-
 ## Prerequisites
 
 - Python 3.12 or newer and [`uv`](https://docs.astral.sh/uv/) for the backend.
-- Stable Flutter SDK, Dart SDK, Android SDK/toolchain, and ADB for the mobile project. These mobile prerequisites are currently missing from this environment.
+- Flutter 3.44.7/Dart 3.12.2 or compatible stable versions, Android SDK, Android command-line tools, accepted licenses, and ADB.
 
 ## Backend Setup and Commands
 
@@ -98,9 +108,19 @@ Backend configuration is loaded from environment variables or an ignored `servic
 
 The planned Android emulator URL is `http://10.0.2.2:8000`. For a physical device, use `adb reverse tcp:8000 tcp:8000` and then `http://127.0.0.1:8000`. Local cleartext HTTP will be allowed only in the generated Android debug manifest; production will require HTTPS.
 
-## Mobile Setup Status
+## Mobile Setup and Commands
 
-No mobile setup/run/test command is currently valid because `apps/mobile/pubspec.yaml` does not exist. Once Flutter is installed, resume with the safe initialization command documented in the [Phase 1 setup guide](docs/phases/phase-01-foundation/setup-guide.md). Dependency resolution, architecture implementation, analysis, tests, and debug APK validation must then be completed before Phase 1 can close.
+Ensure `/home/dhruv/development/flutter/bin` and `/home/dhruv/Android/Sdk/platform-tools` are on `PATH`, then run:
+
+```bash
+cd apps/mobile
+flutter pub get
+flutter analyze
+flutter test
+flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
+
+For a physical device, first run `adb reverse tcp:8000 tcp:8000`, then use `API_BASE_URL=http://127.0.0.1:8000`. Local cleartext traffic is enabled only by the Android debug manifest; production configuration requires HTTPS.
 
 ## Phase 0 Documentation
 
@@ -120,6 +140,10 @@ No mobile setup/run/test command is currently valid because `apps/mobile/pubspec
 - [Setup guide](docs/phases/phase-01-foundation/setup-guide.md)
 - [Architecture decisions](docs/phases/phase-01-foundation/architecture-decisions.md)
 - [Validation report](docs/phases/phase-01-foundation/validation-report.md)
+
+## Phase 2 Documentation
+
+- [Core mobile experience implementation guide](docs/phases/phase-02-core-mobile-experience/implementation-guide.md)
 
 ## Diagrams
 
@@ -143,8 +167,10 @@ This project is intended for a four-person development team. The proposal presen
 
 ## Current Limitations
 
-- The backend is a foundation service with only `/`, `/docs`, and `/api/v1/health`; no business API exists.
-- The Flutter/Android application does not yet exist because its SDK/toolchain is unavailable.
+- A real Supabase project and PostgreSQL target must be configured before
+  end-to-end authentication or database migration validation.
+- Workout, running, and analytics mobile screens remain mock/empty experiences;
+  Phase 3 supplies storage APIs but does not implement sensing or synchronization.
 - Thresholds, model performance, supported Android versions/devices, GPS filters, maps provider, and sync conflict details require Phase 1 decisions and empirical validation.
 - Only one user in supported views/conditions is planned for pose monitoring.
 - Automated cues may be wrong when landmarks are uncertain and are not a substitute for a qualified professional.
@@ -155,6 +181,12 @@ FitVision AI is an automated fitness guidance and record-keeping concept, **not 
 
 ## Next Phase
 
-First, unblock and finish Phase 1 by installing a stable Flutter/Android toolchain outside the repository, genuinely generating `apps/mobile/`, implementing the documented mobile foundation, and passing analysis, tests, and a debug APK build.
+Phase 3 implements Supabase authentication, FastAPI authorization, PostgreSQL
+models, Alembic migrations, RLS policies, and core user-scoped APIs. See
+[`docs/phases/phase-03-auth-backend-database/`](docs/phases/phase-03-auth-backend-database/)
+for setup, security, schema, API, and validation details.
 
-After that gate, the next phase is **Phase 2 — UI/UX, design system, application navigation and mock-data screens**. Its first task should define design tokens and accessible navigation shells using mock-only domain data, without introducing authentication, sensors, persistence, or backend business features.
+The next phase is **Phase 4 — Camera integration and on-device MediaPipe Pose
+Landmarker.** Its first task should establish the typed Flutter-to-Kotlin camera
+and landmark boundary with lifecycle, permission, and performance tests before
+adding exercise state machines.

@@ -1,20 +1,25 @@
 import 'package:fitvision_ai/core/constants/app_constants.dart';
 import 'package:fitvision_ai/features/exercise/models/exercise.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fitvision_ai/core/network/api_client.dart';
 
 enum MockDataMode { data, empty, error }
 
-class ExerciseMockRepository {
+abstract interface class ExerciseRepository {
+  Future<List<Exercise>> fetchExercises();
+}
+
+class ExerciseMockRepository implements ExerciseRepository {
   const ExerciseMockRepository({this.mode = MockDataMode.data});
   final MockDataMode mode;
 
+  @override
   Future<List<Exercise>> fetchExercises() async {
     await Future<void>.delayed(AppConstants.mockDelay);
     if (mode == MockDataMode.error) {
       throw StateError('The demo exercise catalogue could not be loaded.');
     }
     if (mode == MockDataMode.empty) return const [];
-    // TODO(phase-3): Replace with a typed backend data source.
     return exercises;
   }
 
@@ -158,8 +163,51 @@ class ExerciseMockRepository {
   ];
 }
 
-final exerciseRepositoryProvider = Provider<ExerciseMockRepository>(
-  (ref) => const ExerciseMockRepository(),
+class ExerciseApiRepository implements ExerciseRepository {
+  const ExerciseApiRepository(this.client);
+  final ApiClient client;
+
+  @override
+  Future<List<Exercise>> fetchExercises() async {
+    final items = await client.getJsonList('/api/v1/exercises');
+    return items.map(_mapExercise).toList();
+  }
+
+  Exercise _mapExercise(Map<String, dynamic> json) {
+    final rawInstructions = json['instructions'] as List<dynamic>? ?? const [];
+    return Exercise(
+      id: json['slug'] as String,
+      name: json['name'] as String,
+      category: _category(json['category'] as String?),
+      difficulty: ExerciseDifficulty.beginner,
+      description: json['description'] as String,
+      instructions: rawInstructions
+          .map((item) => (item as Map<String, dynamic>)['step'] as String? ?? '')
+          .where((item) => item.isNotEmpty)
+          .toList(),
+      targetMuscles: const [],
+      estimatedDuration: const Duration(minutes: 8),
+      equipment: const ['None'],
+      illustration: (json['name'] as String)
+          .split(' ')
+          .map((part) => part[0])
+          .take(2)
+          .join(),
+      trackingMode: TrackingMode.poseDemo,
+      beginnerFriendly: true,
+    );
+  }
+
+  ExerciseCategory _category(String? value) => switch (value) {
+    'cardio' => ExerciseCategory.cardio,
+    'stability' || 'core' => ExerciseCategory.core,
+    'mobility' => ExerciseCategory.mobility,
+    _ => ExerciseCategory.strength,
+  };
+}
+
+final exerciseRepositoryProvider = Provider<ExerciseRepository>(
+  (ref) => ExerciseApiRepository(ref.watch(apiClientProvider)),
 );
 
 final exerciseCatalogueProvider = FutureProvider<List<Exercise>>(

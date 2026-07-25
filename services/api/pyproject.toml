@@ -4,19 +4,27 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fitvision-api"
-version = "0.1.0"
-description = "FitVision AI foundation API"
+version = "0.3.0"
+description = "FitVision AI authenticated fitness data API"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.139.2",
+    "alembic>=1.18.5",
+    "asyncpg>=0.31.0",
+    "email-validator>=2.3.0",
+    "httpx>=0.28.1",
+    "pyjwt[crypto]>=2.13.0",
+    "pydantic>=2.12.5",
     "pydantic-settings>=2.14.2",
+    "sqlalchemy>=2.0.51",
     "uvicorn[standard]>=0.51.0",
 ]
 
 [dependency-groups]
 dev = [
-    "httpx>=0.28.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
     "pytest>=9.1.1",
     "ruff>=0.15.22",
 ]
@@ -27,6 +35,8 @@ packages = ["app"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+markers = ["integration: requires an explicitly isolated PostgreSQL test database"]
+asyncio_mode = "auto"
 
 [tool.ruff]
 target-version = "py312"
@@ -34,4 +44,4 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-
+ignore = ["B008"]

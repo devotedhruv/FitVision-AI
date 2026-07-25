@@ -2,7 +2,12 @@ import 'package:fitvision_ai/core/config/app_environment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppConfig {
-  const AppConfig({required this.environment, required this.apiBaseUrl});
+  const AppConfig({
+    required this.environment,
+    required this.apiBaseUrl,
+    this.supabaseUrl = '',
+    this.supabasePublishableKey = '',
+  });
 
   factory AppConfig.load() {
     const environmentValue = String.fromEnvironment(
@@ -12,6 +17,10 @@ class AppConfig {
     const apiBaseUrl = String.fromEnvironment(
       'API_BASE_URL',
       defaultValue: 'http://10.0.2.2:8000',
+    );
+    const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+    const supabasePublishableKey = String.fromEnvironment(
+      'SUPABASE_PUBLISHABLE_KEY',
     );
     final environment = AppEnvironment.parse(environmentValue);
     final uri = Uri.tryParse(apiBaseUrl);
@@ -25,11 +34,33 @@ class AppConfig {
     if (environment == AppEnvironment.production && uri.scheme != 'https') {
       throw ArgumentError('Production API_BASE_URL must use HTTPS');
     }
-    return AppConfig(environment: environment, apiBaseUrl: uri);
+    if ((supabaseUrl.isEmpty) != (supabasePublishableKey.isEmpty)) {
+      throw ArgumentError(
+        'SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be provided together.',
+      );
+    }
+    final parsedSupabaseUrl = Uri.tryParse(supabaseUrl);
+    if (supabaseUrl.isNotEmpty &&
+        (parsedSupabaseUrl == null ||
+            !parsedSupabaseUrl.hasScheme ||
+            !parsedSupabaseUrl.hasAuthority)) {
+      throw ArgumentError('SUPABASE_URL must be a valid absolute URL.');
+    }
+    return AppConfig(
+      environment: environment,
+      apiBaseUrl: uri,
+      supabaseUrl: supabaseUrl,
+      supabasePublishableKey: supabasePublishableKey,
+    );
   }
 
   final AppEnvironment environment;
   final Uri apiBaseUrl;
+  final String supabaseUrl;
+  final String supabasePublishableKey;
+
+  bool get hasSupabaseConfiguration =>
+      supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
 }
 
 final appConfigProvider = Provider<AppConfig>(

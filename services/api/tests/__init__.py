@@ -1,2 +1,1 @@
 """API foundation tests."""
-

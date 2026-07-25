@@ -1,74 +1,69 @@
-import 'package:fitvision_ai/core/constants/app_constants.dart';
-import 'package:fitvision_ai/core/design_system/app_icons.dart';
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  bool _notifications = false;
-
-  void _comingSoon(String label) => ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text('$label is coming soon.')));
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Profile')),
-    body: ListView(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      children: [
-        const CircleAvatar(radius: 42, child: Text('A')),
-        const SizedBox(height: AppSpacing.sm),
-        const Center(child: Text(AppConstants.demoUserName)),
-        const Center(child: Text('Goal: build consistent movement habits')),
-        const SizedBox(height: AppSpacing.lg),
-        const ListTile(
-          leading: Icon(Icons.flag_outlined),
-          title: Text('Weekly target'),
-          trailing: Text('4 workouts'),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(currentProfileProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: profile.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, _) => Center(
+          child: FilledButton(
+            onPressed: () => ref.invalidate(currentProfileProvider),
+            child: const Text('Retry profile'),
+          ),
         ),
-        SwitchListTile(
-          secondary: const Icon(Icons.notifications_outlined),
-          title: const Text('Demo notifications'),
-          subtitle: const Text('Preference only; no notifications are sent'),
-          value: _notifications,
-          onChanged: (value) => setState(() => _notifications = value),
+        data: (value) => ListView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
+            CircleAvatar(
+              radius: 42,
+              child: Text(value.displayName.substring(0, 1).toUpperCase()),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Center(child: Text(value.displayName)),
+            ListTile(
+              leading: const Icon(Icons.straighten),
+              title: const Text('Preferred units'),
+              subtitle: Text(value.preferredUnits),
+              onTap: () async {
+                final next = value.preferredUnits == 'metric'
+                    ? 'imperial'
+                    : 'metric';
+                await ref
+                    .read(profileRepositoryProvider)
+                    .update(preferredUnits: next);
+                ref.invalidate(currentProfileProvider);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.analytics_outlined),
+              title: const Text('View analytics'),
+              onTap: () => context.push('/analytics'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sign out'),
+              onTap: () => ref.read(authViewModelProvider).logout(),
+            ),
+            const AboutListTile(
+              icon: Icon(Icons.info_outline),
+              applicationName: 'FitVision AI',
+              applicationVersion: '1.0.0 (Phase 3)',
+              applicationLegalese:
+                  'Fitness guidance prototype; not medical advice.',
+            ),
+          ],
         ),
-        const ListTile(
-          leading: Icon(Icons.brightness_6_outlined),
-          title: Text('Theme'),
-          subtitle: Text('Uses your system light or dark setting'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.lock_outline),
-          title: const Text('Permissions'),
-          subtitle: const Text('Camera and location have not been requested'),
-          onTap: () => _comingSoon('Permission management'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.privacy_tip_outlined),
-          title: const Text('Privacy information'),
-          onTap: () => _comingSoon('Privacy information'),
-        ),
-        ListTile(
-          leading: const Icon(AppIcons.analytics),
-          title: const Text('View analytics'),
-          onTap: () => context.push('/analytics'),
-        ),
-        const AboutListTile(
-          icon: Icon(Icons.info_outline),
-          applicationName: 'FitVision AI',
-          applicationVersion: '1.0.0 (Phase 2 demo)',
-          applicationLegalese:
-              'Fitness guidance prototype; not medical advice.',
-        ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

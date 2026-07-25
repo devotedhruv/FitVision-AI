@@ -12,7 +12,15 @@ uv --version
 python3 --version
 ```
 
-At validation time, `uv 0.11.29` and Python `3.14.6` were available. Flutter, Dart, ADB, and the Android toolchain were unavailable. Do not run the mobile commands below until a stable Flutter SDK and Android SDK are installed outside this repository by the developer/system administrator.
+At validation time, Flutter 3.44.7, Dart 3.12.2, ADB 37.0.0, `uv 0.11.29`, and Python 3.14.6 were available. Add these installed tool locations when they are not already in the shell profile:
+
+```bash
+export PATH=/home/dhruv/development/flutter/bin:/home/dhruv/Android/Sdk/platform-tools:$PATH
+export ANDROID_HOME=/home/dhruv/Android/Sdk
+export ANDROID_SDK_ROOT=/home/dhruv/Android/Sdk
+```
+
+`flutter doctor -v` currently reports missing Android command-line tools and unknown aggregate license status. Resolve those before relying on APK/device validation.
 
 ## Backend Dependencies
 
@@ -47,21 +55,48 @@ UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run pytest
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run python -c "from app.main import app; print(app.title, app.version)"
 ```
 
-## Mobile Initialization Blocker
+## Mobile Dependencies and Quality Checks
 
-`apps/mobile/pubspec.yaml` does not exist because `flutter create` could not run. Once a stable Flutter SDK is available, the first command from the repository root is:
+```bash
+cd /home/dhruv/fitvision-ai/apps/mobile
+flutter pub get
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+```
+
+## Run on an Android Emulator
+
+Start the backend first, then from the mobile directory:
+
+```bash
+cd /home/dhruv/fitvision-ai/apps/mobile
+flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
+
+`10.0.2.2` maps Android Emulator traffic to the host loopback interface.
+
+## Run on a Physical Android Device
 
 ```bash
 cd /home/dhruv/fitvision-ai
-flutter create --project-name fitvision_ai --org com.fitvisionai --platforms android apps/mobile
+adb reverse tcp:8000 tcp:8000
+cd apps/mobile
+flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://127.0.0.1:8000
 ```
 
-After generation, the Phase 1 mobile source architecture and pinned dependencies must be implemented before `flutter pub get`, `flutter analyze`, `flutter test`, or `flutter run` are valid repository instructions. They are intentionally not presented here as currently runnable commands.
-
-## Planned Development Networking After Mobile Completion
+## Development Networking Notes
 
 - Android Emulator: compile with `API_BASE_URL=http://10.0.2.2:8000` because `10.0.2.2` maps to the host loopback interface.
 - Physical Android device: run `adb reverse tcp:8000 tcp:8000`, then compile with `API_BASE_URL=http://127.0.0.1:8000`.
 - Never hardcode a personal LAN address.
-- Debug-only Android configuration may allow local cleartext HTTP. Production must use HTTPS.
+- Debug-only Android configuration allows local cleartext HTTP. Production must use HTTPS and is rejected by mobile configuration if an HTTP URL is supplied.
 
+## Debug APK
+
+After `flutter doctor -v` reports a usable Android toolchain:
+
+```bash
+cd /home/dhruv/fitvision-ai/apps/mobile
+flutter build apk --debug --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```

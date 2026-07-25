@@ -1,8 +1,9 @@
 # FitVision AI Mobile
 
-Android-first Flutter client for FitVision AI. Phase 2 provides a complete
-mock-data mobile experience without camera, GPS, authentication, or backend
-business integration.
+Android-first Flutter client for FitVision AI. Phase 2 provides the visual
+experience. Phase 3 adds Supabase registration, login, email-verification state,
+logout, authenticated API requests, profile integration, and the backend
+exercise catalogue without changing the sensing screens.
 
 ## Run
 
@@ -10,11 +11,13 @@ business integration.
 flutter pub get
 flutter run \
   --dart-define=APP_ENV=development \
-  --dart-define=API_BASE_URL=http://10.0.2.2:8000
+  --dart-define=API_BASE_URL=http://10.0.2.2:8000 \
+  --dart-define=SUPABASE_URL=https://PROJECT.supabase.co \
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=PUBLIC_KEY
 ```
 
-The Phase 2 screens do not require the API to be running. The API configuration
-and diagnostic foundation from Phase 1 remain available in the codebase.
+Only public Supabase values belong in Flutter. The database URL, service-role
+key, and JWT signing material must never be passed to the app.
 
 ## Verify
 

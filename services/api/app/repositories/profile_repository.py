@@ -1,0 +1,31 @@
+"""Profile-only SQLAlchemy queries."""
+
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.profile import Profile
+from app.schemas.profile import ProfileUpdate
+
+
+class ProfileRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get(self, user_id: UUID) -> Profile | None:
+        return await self.session.scalar(select(Profile).where(Profile.id == user_id))
+
+    async def ensure(self, user_id: UUID, display_name: str) -> Profile:
+        profile = await self.get(user_id)
+        if profile is None:
+            profile = Profile(id=user_id, display_name=display_name)
+            self.session.add(profile)
+            await self.session.flush()
+        return profile
+
+    async def update(self, profile: Profile, data: ProfileUpdate) -> Profile:
+        for field, value in data.model_dump(exclude_unset=True).items():
+            setattr(profile, field, str(value) if field == "avatar_url" and value else value)
+        await self.session.flush()
+        return profile

@@ -22,6 +22,11 @@ final class ServerFailure extends Failure {
       );
 }
 
+final class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure()
+    : super('Your session has expired. Please sign in again.');
+}
+
 final class ConfigurationFailure extends Failure {
   const ConfigurationFailure()
     : super('The application configuration is invalid.');

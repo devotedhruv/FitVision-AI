@@ -149,5 +149,4 @@ Criteria identify the principal requirements they validate; the complete verific
 - [x] Assumptions, constraints, limitations, and risks are documented.
 - [x] System architecture, user flow, and conceptual ERD PNGs exist and are readable.
 - [x] Root README links to every Phase 0 document and previews every diagram.
-- [x] No Phase 1 application, API, migration, production, or dependency code was created.
-
+- [x] The Phase 0 work created no Phase 1 application, API, migration, production, or dependency code. Later Phase 1 artifacts now present in the repository are outside this Phase 0 deliverable and were preserved.

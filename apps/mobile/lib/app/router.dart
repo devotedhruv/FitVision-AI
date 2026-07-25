@@ -6,6 +6,10 @@ import 'package:fitvision_ai/features/exercise/presentation/exercise_detail_view
 import 'package:fitvision_ai/features/exercise/presentation/exercise_list_view.dart';
 import 'package:fitvision_ai/features/exercise/presentation/live_exercise_view.dart';
 import 'package:fitvision_ai/features/history/presentation/history_view.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/authentication/presentation/email_verification_view.dart';
+import 'package:fitvision_ai/features/authentication/presentation/login_view.dart';
+import 'package:fitvision_ai/features/authentication/presentation/register_view.dart';
 import 'package:fitvision_ai/features/onboarding/presentation/onboarding_view.dart';
 import 'package:fitvision_ai/features/profile/presentation/profile_view.dart';
 import 'package:fitvision_ai/features/running/presentation/running_view.dart';
@@ -23,13 +27,38 @@ abstract final class AppRouteNames {
   static const history = 'history';
   static const analytics = 'analytics';
   static const profile = 'profile';
+  static const login = 'login';
+  static const register = 'register';
+  static const verifyEmail = 'verify-email';
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+AuthViewModel? activeAuthViewModel;
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/dashboard',
+  redirect: (context, state) {
+    final auth = activeAuthViewModel;
+    if (auth == null || auth.status == AuthStatus.loading) return null;
+    final authRoute = {
+      '/login',
+      '/register',
+      '/verify-email',
+    }.contains(state.matchedLocation);
+    if (auth.status == AuthStatus.unauthenticated) {
+      return authRoute ? null : '/login';
+    }
+    if (auth.status == AuthStatus.verificationRequired) {
+      return state.matchedLocation == '/verify-email'
+          ? null
+          : '/verify-email';
+    }
+    if (auth.status == AuthStatus.authenticated && authRoute) {
+      return '/dashboard';
+    }
+    return null;
+  },
   routes: [
     GoRoute(path: '/', redirect: (context, state) => '/dashboard'),
     GoRoute(
@@ -117,6 +146,21 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      name: AppRouteNames.login,
+      path: '/login',
+      builder: (context, state) => const LoginView(),
+    ),
+    GoRoute(
+      name: AppRouteNames.register,
+      path: '/register',
+      builder: (context, state) => const RegisterView(),
+    ),
+    GoRoute(
+      name: AppRouteNames.verifyEmail,
+      path: '/verify-email',
+      builder: (context, state) => const EmailVerificationView(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

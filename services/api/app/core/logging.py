@@ -19,4 +19,3 @@ def configure_logging(level: str) -> None:
 
     for handler in root.handlers:
         handler.setLevel(level)
-

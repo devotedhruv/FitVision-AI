@@ -1,31 +1,36 @@
 # Phase 1 Validation Report
 
-Validation date: 2026-07-21 (Asia/Kathmandu).
+Validation date: 2026-07-22 (Asia/Kathmandu).
 
 ## Tool Versions
 
 | Tool | Result |
 |---|---|
+| Flutter | `3.44.7` stable |
+| Dart | `3.12.2` stable |
+| ADB | `37.0.0` |
+| Android SDK | Platform/build tools 36; NDK `28.2.13676358` installed during validation |
+| Java | OpenJDK 26 system; OpenJDK 17 and Android Studio JBR 21 also tested for Gradle |
 | Python | `3.14.6` |
 | uv | `0.11.29` |
-| Java | OpenJDK `26.0.1` |
-| Flutter | Not found on `PATH`; common SDK locations also checked |
-| Dart | Not found on `PATH` |
-| ADB | Not found on `PATH` |
+
+`flutter doctor -v` detects Flutter and ADB but still reports missing Android `cmdline-tools` and unknown aggregate license status. Chrome is absent but irrelevant to the Android-only Phase 1 target.
 
 ## Commands and Results
 
 | Check | Command | Result |
 |---|---|---|
-| Resolve backend | `UV_CACHE_DIR=/tmp/fitvision-uv-cache uv sync --all-groups` | Passed in ignored `services/api/.venv`; lockfile generated |
-| Backend lint | `uv run ruff check .` with the same cache/environment overrides | Passed: `All checks passed!` |
-| Backend tests | `uv run pytest` | Passed: `5 passed in 0.06s` |
-| Import safety | `uv run python -c 'from app.main import app; …'` | Passed: `FitVision AI API 0.1.0` |
-| Live health | temporary Uvicorn on `127.0.0.1:8001`, then `curl /api/v1/health` | Passed: HTTP 200, expected four-field development payload; server stopped |
-| Flutter create | `flutter --version` preflight | Blocked: command not found, so generation was not attempted |
-| Dart format/analyze | preflight | Not executed: Dart/Flutter and mobile project unavailable |
-| Flutter tests | preflight | Not executed: Flutter and mobile project unavailable |
-| Debug APK | preflight | Not executed: Flutter/Android SDK unavailable |
+| Generate Android project | `flutter create --project-name fitvision_ai --org com.fitvisionai --platforms android apps/mobile` | Passed; 35 generated files |
+| Resolve mobile packages | `flutter pub get` | Passed; lockfile generated |
+| Dart format verification | `dart format --output=none --set-exit-if-changed .` | Passed; 17 files unchanged after formatting |
+| Flutter analysis | `flutter analyze` | Passed: no issues |
+| Flutter tests | `flutter test --reporter expanded` | Passed: 1 widget test |
+| Debug APK | `flutter build apk --debug ...` and direct Gradle diagnostics | Not completed; see blocker below |
+| Resolve backend | `UV_CACHE_DIR=/tmp/fitvision-uv-cache uv sync --all-groups` | Passed |
+| Backend lint | `uv run ruff check .` | Passed: `All checks passed!` |
+| Backend tests | `uv run pytest` | Passed: `5 passed in 0.05s` |
+| Import safety | `uv run python -c "from app.main import app; ..."` | Passed: `FitVision AI API 0.1.0` |
+| Live health | temporary Uvicorn plus `curl /api/v1/health` | Passed: HTTP 200; server stopped |
 
 ## Health Response
 
@@ -33,24 +38,22 @@ Validation date: 2026-07-21 (Asia/Kathmandu).
 {"status":"ok","service":"fitvision-api","version":"0.1.0","environment":"development"}
 ```
 
-## Dependency Versions Resolved
+## Mobile Foundation Results
 
-- FastAPI 0.139.2
-- Uvicorn 0.51.0 with standard extras
-- pydantic-settings 2.14.2
-- Pytest 9.1.1
-- HTTPX 0.28.1
-- Ruff 0.15.22
+- Android project, asset folders, pinned dependencies, and `pubspec.lock` exist.
+- Material 3 light/dark themes, `/` and `/error` routes, not-found handling, Riverpod composition, compile-time configuration, typed failures, isolated Dio client, health service, storage abstraction, and foundation screen are implemented.
+- Main manifest contains Internet permission; debug manifest alone enables cleartext traffic.
+- Production configuration rejects a non-HTTPS API base URL.
+- The generated Kotlin launcher was replaced by an equivalent Java `FlutterActivity` after `compileDebugKotlin` repeatedly stalled. No native business logic was introduced.
 
-Exact transitive resolution is recorded in `services/api/uv.lock`.
+## Debug APK Blocker
 
-## Known Warnings and Corrections
+The first Android build downloaded Gradle/AGP artifacts, Android Platform 36, and NDK `28.2.13676358`. Multiple builds using Java 17, Java 21, Java 26, Kotlin daemon, and in-process Kotlin compilation were attempted. The generated Kotlin launcher stalled indefinitely at `compileDebugKotlin`; after replacing it with an equivalent Java launcher, Gradle passed Kotlin as `NO-SOURCE` but stalled at `compileDebugJavaWithJavac`. No APK was emitted.
 
-- The default `uv` cache under the home directory was read-only in the managed environment, so validation used `/tmp/fitvision-uv-cache`. Final checks used the ignored project-local `services/api/.venv`. An initial temporary environment under `/tmp` was also used during dependency resolution; neither environment is committed.
-- `uv` warned that cache hardlinks were unavailable across filesystems and safely copied packages instead; this affects installation speed only.
-- An initial synchronous FastAPI `TestClient` run hung under the available Python 3.14 runtime. Tests were correctly changed to HTTPX `ASGITransport`, remained in-process, and then passed. No Python replacement was installed.
-- Local port binding is sandbox-restricted. The live health check was run with explicit approval, succeeded, and the temporary server was stopped.
+The remaining environment warning is an incomplete command-line-tools installation. `flutter doctor` cannot verify all licenses even though licenses for Platform 36 and NDK 28 were accepted during Gradle installation. Phase 1 must not be marked fully complete until command-line tools/licenses are repaired and an APK plus Android device launch succeed.
 
-## Blockers
+## Known Warnings
 
-The Flutter SDK, Dart SDK, ADB, and Android tooling are unavailable. Phase 1 cannot be marked complete because the Android project, mobile architecture, dependency lock, analysis/tests, and debug build do not exist. Generated files were not imitated manually.
+- Flutter 3.44's generated AGP 9 compatibility flags are deprecated upstream but currently required by the Flutter Gradle plugin.
+- Gradle reports a Flutter-tooling embedded Kotlin compatibility warning; application Kotlin code is not present in Phase 1.
+- Several transitive Dart packages have newer versions outside the compatible resolution; direct dependencies are current compatible pinned versions.

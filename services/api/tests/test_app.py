@@ -17,7 +17,12 @@ async def test_root_redirects_to_documentation(client: AsyncClient) -> None:
 async def test_unknown_route_returns_not_found(client: AsyncClient) -> None:
     response = await client.get("/not-a-route")
     assert response.status_code == 404
-    assert response.json() == {"detail": "Not Found"}
+    assert response.json() == {
+        "error": {
+            "code": "RESOURCE_NOT_FOUND",
+            "message": "The requested resource was not found.",
+        }
+    }
 
 
 def test_application_import_does_not_start_server() -> None:

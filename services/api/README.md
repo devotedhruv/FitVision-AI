@@ -1,6 +1,8 @@
 # FitVision AI API
 
-Phase 1 FastAPI foundation. It exposes only a documentation redirect and the unauthenticated `GET /api/v1/health` endpoint. Authentication, databases, workout APIs, and analytics are intentionally deferred.
+Phase 3 FastAPI service with asymmetric Supabase JWT verification, asynchronous
+PostgreSQL persistence, Alembic migrations, and user-scoped profile, exercise,
+workout, run, and analytics APIs.
 
 ## Local development
 
@@ -13,5 +15,13 @@ UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run pytest
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Settings can be supplied through environment variables or a local `.env`, which is ignored by Git. Use the root `.env.example` as documentation; never commit real credentials.
+Configure an ignored `.env` from the root `.env.example`. Apply Alembic only
+after reviewing an explicit database target:
 
+```bash
+UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run alembic upgrade head
+```
+
+The health endpoint is public. Resource endpoints require a verified Supabase
+access token. Never commit credentials or expose the database URL, service-role
+key, or JWT secret to Flutter.

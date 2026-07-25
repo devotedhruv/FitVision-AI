@@ -1,2 +1,1 @@
 """FitVision AI API package."""
-
