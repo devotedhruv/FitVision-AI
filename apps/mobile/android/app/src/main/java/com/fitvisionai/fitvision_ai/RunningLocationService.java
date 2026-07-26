@@ -1,18 +1,199 @@
 package com.fitvisionai.fitvision_ai;
 
-import android.Manifest; import android.app.*; import android.content.*; import android.content.pm.PackageManager; import android.location.*; import android.os.*; import androidx.core.app.NotificationCompat; import androidx.core.content.ContextCompat; import java.util.*; import io.flutter.plugin.common.EventChannel;
+import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.SystemClock;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import io.flutter.plugin.common.EventChannel;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
-public final class RunningLocationService extends Service implements LocationListener {
-  private static final String CHANNEL="fitvision_running"; private static final int ID=7407; private static volatile boolean running=false,paused=false; private static EventChannel.EventSink sink; private static RunningLocationService instance; private LocationManager manager; private long startedElapsed;
-  static void setSink(EventChannel.EventSink value){sink=value;} static boolean isRunning(){return running;} static void setPaused(boolean value){paused=value;if(instance!=null)instance.notifyProgress(null,null);} static void updateProgress(Object duration,Object distance){if(instance!=null)instance.notifyProgress(duration,distance);}
-  @Override public void onCreate(){super.onCreate();instance=this;manager=(LocationManager)getSystemService(LOCATION_SERVICE);createChannel();}
-  @Override public int onStartCommand(Intent intent,int flags,int startId){if(running)return START_STICKY; running=true;paused=false;startedElapsed=SystemClock.elapsedRealtime();startForeground(ID,notification("Starting GPS…"));if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){stopSelf();return START_NOT_STICKY;}try{manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,2000L,3f,this,Looper.getMainLooper());}catch(Exception ignored){stopSelf();}return START_STICKY;}
-  @Override public void onLocationChanged(Location l){if(paused)return;EventChannel.EventSink current=sink;if(current==null)return;Map<String,Object> m=new HashMap<>();m.put("latitude",l.getLatitude());m.put("longitude",l.getLongitude());m.put("altitude",l.hasAltitude()?l.getAltitude():null);m.put("accuracy",(double)l.getAccuracy());m.put("verticalAccuracy",Build.VERSION.SDK_INT>=26&&l.hasVerticalAccuracy()?(double)l.getVerticalAccuracyMeters():null);m.put("speed",l.hasSpeed()?(double)l.getSpeed():null);m.put("speedAccuracy",Build.VERSION.SDK_INT>=26&&l.hasSpeedAccuracy()?(double)l.getSpeedAccuracyMetersPerSecond():null);m.put("bearing",l.hasBearing()?(double)l.getBearing():null);m.put("timestamp",l.getTime());m.put("elapsedRealtimeMs",l.getElapsedRealtimeNanos()/1000000L);current.success(m);}
-  @Override public void onProviderDisabled(String provider){EventChannel.EventSink current=sink;if(current!=null)current.error("GPS_DISABLED","Location services are disabled",null);}
-  private void createChannel(){NotificationManager nm=getSystemService(NotificationManager.class);nm.createNotificationChannel(new NotificationChannel(CHANNEL,"Active run tracking",NotificationManager.IMPORTANCE_LOW));}
-  private Notification notification(String text){Intent open=new Intent(this,MainActivity.class);PendingIntent pi=PendingIntent.getActivity(this,0,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);return new NotificationCompat.Builder(this,CHANNEL).setSmallIcon(android.R.drawable.ic_menu_mylocation).setContentTitle(paused?"Run paused":"FitVision run in progress").setContentText(text).setOngoing(true).setOnlyAlertOnce(true).setContentIntent(pi).setCategory(NotificationCompat.CATEGORY_SERVICE).build();}
-  private void notifyProgress(Object duration,Object distance){String d=duration==null?format(SystemClock.elapsedRealtime()-startedElapsed):duration.toString();String km=distance==null?"0.00":distance.toString();getSystemService(NotificationManager.class).notify(ID,notification(d+" • "+km+" km"));}
-  private String format(long ms){long s=Math.max(0,ms/1000);return String.format(Locale.US,"%02d:%02d",s/60,s%60);}
-  @Override public void onDestroy(){if(manager!=null)manager.removeUpdates(this);stopForeground(STOP_FOREGROUND_REMOVE);running=false;paused=false;instance=null;super.onDestroy();}
-  @Override public android.os.IBinder onBind(Intent intent){return null;}
+public final class RunningLocationService extends Service {
+  private static final String CHANNEL = "fitvision_running";
+  private static final int NOTIFICATION_ID = 7407;
+  private static volatile boolean running = false;
+  private static volatile boolean paused = false;
+  private static EventChannel.EventSink sink;
+  private static RunningLocationService instance;
+
+  private FusedLocationProviderClient locationClient;
+  private LocationCallback locationCallback;
+  private long startedElapsed;
+
+  static void setSink(EventChannel.EventSink value) {
+    sink = value;
+  }
+
+  static boolean isRunning() {
+    return running;
+  }
+
+  static void setPaused(boolean value) {
+    paused = value;
+    if (instance != null) instance.notifyProgress(null, null);
+  }
+
+  static void updateProgress(Object duration, Object distance) {
+    if (instance != null) instance.notifyProgress(duration, distance);
+  }
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    instance = this;
+    locationClient = LocationServices.getFusedLocationProviderClient(this);
+    locationCallback =
+        new LocationCallback() {
+          @Override
+          public void onLocationResult(LocationResult result) {
+            for (Location location : result.getLocations()) emitLocation(location);
+          }
+        };
+    createChannel();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    if (running) return START_STICKY;
+
+    running = true;
+    paused = false;
+    startedElapsed = SystemClock.elapsedRealtime();
+    startForeground(NOTIFICATION_ID, notification("Acquiring precise location…"));
+
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED) {
+      publishError("LOCATION_PERMISSION", "Precise location permission is required");
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+
+    LocationRequest request =
+        new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000L)
+            .setMinUpdateIntervalMillis(1000L)
+            .setMinUpdateDistanceMeters(3f)
+            .build();
+    try {
+      locationClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper());
+    } catch (SecurityException exception) {
+      publishError("LOCATION_PERMISSION", "Precise location permission is required");
+      stopSelf();
+      return START_NOT_STICKY;
+    } catch (RuntimeException exception) {
+      publishError("GPS_UNAVAILABLE", "Unable to start location tracking");
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+    return START_STICKY;
+  }
+
+  private void emitLocation(Location location) {
+    if (paused) return;
+    EventChannel.EventSink current = sink;
+    if (current == null) return;
+
+    Map<String, Object> value = new HashMap<>();
+    value.put("latitude", location.getLatitude());
+    value.put("longitude", location.getLongitude());
+    value.put("altitude", location.hasAltitude() ? location.getAltitude() : null);
+    value.put("accuracy", (double) location.getAccuracy());
+    value.put(
+        "verticalAccuracy",
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()
+            ? (double) location.getVerticalAccuracyMeters()
+            : null);
+    value.put("speed", location.hasSpeed() ? (double) location.getSpeed() : null);
+    value.put(
+        "speedAccuracy",
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && location.hasSpeedAccuracy()
+            ? (double) location.getSpeedAccuracyMetersPerSecond()
+            : null);
+    value.put("bearing", location.hasBearing() ? (double) location.getBearing() : null);
+    value.put("timestamp", location.getTime());
+    value.put("elapsedRealtimeMs", location.getElapsedRealtimeNanos() / 1_000_000L);
+    current.success(value);
+  }
+
+  private void publishError(String code, String message) {
+    EventChannel.EventSink current = sink;
+    if (current != null) current.error(code, message, null);
+  }
+
+  private void createChannel() {
+    NotificationManager manager = getSystemService(NotificationManager.class);
+    manager.createNotificationChannel(
+        new NotificationChannel(
+            CHANNEL, "Active run tracking", NotificationManager.IMPORTANCE_LOW));
+  }
+
+  private Notification notification(String text) {
+    Intent open = new Intent(this, MainActivity.class);
+    PendingIntent pendingIntent =
+        PendingIntent.getActivity(
+            this,
+            0,
+            open,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    return new NotificationCompat.Builder(this, CHANNEL)
+        .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+        .setContentTitle(paused ? "Run paused" : "FitVision run in progress")
+        .setContentText(text)
+        .setOngoing(true)
+        .setOnlyAlertOnce(true)
+        .setContentIntent(pendingIntent)
+        .setCategory(NotificationCompat.CATEGORY_SERVICE)
+        .build();
+  }
+
+  private void notifyProgress(Object duration, Object distance) {
+    String elapsed =
+        duration == null
+            ? format(SystemClock.elapsedRealtime() - startedElapsed)
+            : duration.toString();
+    String kilometers = distance == null ? "0.00" : distance.toString();
+    getSystemService(NotificationManager.class)
+        .notify(NOTIFICATION_ID, notification(elapsed + " • " + kilometers + " km"));
+  }
+
+  private String format(long milliseconds) {
+    long seconds = Math.max(0, milliseconds / 1000);
+    return String.format(Locale.US, "%02d:%02d", seconds / 60, seconds % 60);
+  }
+
+  @Override
+  public void onDestroy() {
+    if (locationClient != null && locationCallback != null) {
+      locationClient.removeLocationUpdates(locationCallback);
+    }
+    stopForeground(STOP_FOREGROUND_REMOVE);
+    running = false;
+    paused = false;
+    instance = null;
+    super.onDestroy();
+  }
+
+  @Nullable
+  @Override
+  public IBinder onBind(Intent intent) {
+    return null;
+  }
 }

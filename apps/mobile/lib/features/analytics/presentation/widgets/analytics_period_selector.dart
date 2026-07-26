@@ -12,7 +12,12 @@ class AnalyticsPeriodSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SegmentedButton(
     segments: AnalyticsPeriodType.values
-        .map((v) => ButtonSegment(value: v, label: Text(v.name)))
+        .map(
+          (v) => ButtonSegment(
+            value: v,
+            label: Text('${v.name[0].toUpperCase()}${v.name.substring(1)}'),
+          ),
+        )
         .toList(),
     selected: {value},
     onSelectionChanged: (s) => onChanged(s.first),

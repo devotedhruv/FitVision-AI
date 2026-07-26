@@ -1,4 +1,5 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
 import 'package:fitvision_ai/core/errors/app_exception.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
@@ -60,47 +61,87 @@ class ProfileView extends ConsumerWidget {
                   ),
                 ),
               ),
-            CircleAvatar(
-              radius: 42,
-              child: Text(value.displayName.substring(0, 1).toUpperCase()),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 34,
+                      child: Text(
+                        value.displayName.substring(0, 1).toUpperCase(),
+                        style: AppTypography.pageTitle(context),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            value.displayName,
+                            style: AppTypography.pageTitle(context),
+                          ),
+                          Text(
+                            'FitVision member',
+                            style: AppTypography.caption(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Center(child: Text(value.displayName)),
-            ListTile(
-              leading: const Icon(Icons.straighten),
-              title: const Text('Preferred units'),
-              subtitle: Text(value.preferredUnits),
-              onTap: () async {
-                final next = value.preferredUnits == 'metric'
-                    ? 'imperial'
-                    : 'metric';
-                await ref
-                    .read(profileRepositoryProvider)
-                    .update(preferredUnits: next);
-                ref.invalidate(currentProfileProvider);
-              },
+            const SizedBox(height: AppSpacing.md),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.straighten),
+                    title: const Text('Preferred units'),
+                    subtitle: Text(value.preferredUnits),
+                    onTap: () async {
+                      final next = value.preferredUnits == 'metric'
+                          ? 'imperial'
+                          : 'metric';
+                      await ref
+                          .read(profileRepositoryProvider)
+                          .update(preferredUnits: next);
+                      ref.invalidate(currentProfileProvider);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.analytics_outlined),
+                    title: const Text('View analytics'),
+                    onTap: () => context.push('/analytics'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: const Text('Settings'),
+                    onTap: () => context.push('/settings'),
+                  ),
+                ],
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.analytics_outlined),
-              title: const Text('View analytics'),
-              onTap: () => context.push('/analytics'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text('Settings'),
-              onTap: () => context.push('/settings'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Sign out'),
-              onTap: () => ref.read(authViewModelProvider).logout(),
-            ),
-            const AboutListTile(
-              icon: Icon(Icons.info_outline),
-              applicationName: 'FitVision AI',
-              applicationVersion: '1.0.0 (Phase 3)',
-              applicationLegalese:
-                  'Fitness guidance prototype; not medical advice.',
+            const SizedBox(height: AppSpacing.md),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Sign out'),
+                    onTap: () => ref.read(authViewModelProvider).logout(),
+                  ),
+                  const AboutListTile(
+                    icon: Icon(Icons.info_outline),
+                    applicationName: 'FitVision AI',
+                    applicationVersion: '1.0.0 (Phase 3)',
+                    applicationLegalese:
+                        'Fitness guidance prototype; not medical advice.',
+                  ),
+                ],
+              ),
             ),
           ],
         ),

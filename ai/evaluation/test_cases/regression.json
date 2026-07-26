@@ -1,0 +1,10 @@
+[
+  {
+    "annotation": {"annotationVersion":"1.0.0","sampleId":"synthetic_squat_hold","exerciseType":"squat","split":"regression","expectedCompleteRepCount":0,"expectedIncompleteRepCount":0,"repRanges":[],"formLabels":[],"visibilityLossIntervals":[],"cameraPosition":"left_side","distanceCategory":"supported","lightingCategory":"normal","repetitionSpeed":"hold","deviceCategory":"synthetic"},
+    "prediction": {"completeRepCount":0,"incompleteRepCount":0,"frameLatenciesMs":[0.31,0.28,0.35,0.30]}
+  },
+  {
+    "annotation": {"annotationVersion":"1.0.0","sampleId":"synthetic_curl_full","exerciseType":"curl","split":"regression","expectedCompleteRepCount":1,"expectedIncompleteRepCount":0,"repRanges":[{"startMs":0,"endMs":1200,"complete":true}],"formLabels":[],"visibilityLossIntervals":[],"cameraPosition":"right_side","distanceCategory":"supported","lightingCategory":"normal","repetitionSpeed":"normal","deviceCategory":"synthetic"},
+    "prediction": {"completeRepCount":1,"incompleteRepCount":0,"frameLatenciesMs":[0.29,0.32,0.33]}
+  }
+]

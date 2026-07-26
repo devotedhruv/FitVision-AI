@@ -1,0 +1,19 @@
+name: Backend tests
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: {enable-cache: true}
+      - run: uv sync --frozen
+        working-directory: services/api
+      - run: uv run ruff format --check . && uv run ruff check .
+        working-directory: services/api
+      - run: uv run pytest -q
+        working-directory: services/api
+      - run: uv run alembic heads
+        working-directory: services/api

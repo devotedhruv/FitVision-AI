@@ -212,7 +212,14 @@ class _CameraGuide extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
-        const Icon(Icons.phone_android, size: 72),
+        Container(
+          height: 180,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(AppRadius.extraLarge),
+          ),
+          child: const Center(child: Icon(Icons.phone_android, size: 72)),
+        ),
         const SizedBox(height: AppSpacing.md),
         Text(
           'Place your phone securely',
@@ -287,10 +294,18 @@ class _ControlPanel extends StatelessWidget {
           children: [
             Semantics(
               liveRegion: true,
-              child: Text(
-                state.feedback,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: _feedbackColor(context),
+                  borderRadius: BorderRadius.circular(AppRadius.medium),
+                ),
+                child: Text(
+                  state.feedback,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -300,7 +315,14 @@ class _ControlPanel extends StatelessWidget {
                   label: 'Stage',
                   value: state.analysis.stage.name.toUpperCase(),
                 ),
-                _Metric(label: 'Reps', value: '${state.analysis.repCount}'),
+                _Metric(
+                  label: 'Valid',
+                  value: '${state.analysis.validRepCount}',
+                ),
+                _Metric(
+                  label: 'Adjust',
+                  value: '${state.analysis.invalidRepCount}',
+                ),
                 _Metric(
                   label: 'Timer',
                   value: DateTimeFormatter.duration(state.elapsed),
@@ -358,6 +380,14 @@ class _ControlPanel extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _feedbackColor(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final status = state.analysis.formStatus;
+    if (status == 'FORM OK') return scheme.primaryContainer;
+    if (status == 'ADJUST FORM') return scheme.errorContainer;
+    return scheme.surfaceContainerHighest;
   }
 }
 

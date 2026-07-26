@@ -16,12 +16,23 @@ class ExerciseDetailView extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
-        CircleAvatar(
-          radius: 44,
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Text(
-            exercise.illustration,
-            style: AppTypography.pageTitle(context),
+        Container(
+          height: 210,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.secondaryContainer,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.extraLarge),
+          ),
+          child: Icon(
+            Icons.fitness_center,
+            size: 88,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
           ),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -30,6 +41,22 @@ class ExerciseDetailView extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         Text(exercise.description),
         const SizedBox(height: AppSpacing.lg),
+        Text('How to perform', style: AppTypography.sectionTitle(context)),
+        const SizedBox(height: AppSpacing.xs),
+        Card(
+          child: ExpansionTile(
+            initiallyExpanded: true,
+            title: const Text('Step-by-step guidance'),
+            children: [
+              for (var i = 0; i < exercise.instructions.length; i++)
+                ListTile(
+                  leading: CircleAvatar(child: Text('${i + 1}')),
+                  title: Text(exercise.instructions[i]),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
         _InfoCard(
           title: 'Session overview',
           lines: [
@@ -38,15 +65,6 @@ class ExerciseDetailView extends StatelessWidget {
             'Estimated duration: ${exercise.estimatedDuration.inMinutes} minutes',
           ],
         ),
-        const SizedBox(height: AppSpacing.md),
-        Text('How to perform', style: AppTypography.sectionTitle(context)),
-        const SizedBox(height: AppSpacing.xs),
-        for (var i = 0; i < exercise.instructions.length; i++)
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: CircleAvatar(child: Text('${i + 1}')),
-            title: Text(exercise.instructions[i]),
-          ),
         const SizedBox(height: AppSpacing.md),
         const _InfoCard(
           title: 'Basic safety guidance',
@@ -83,6 +101,7 @@ class ExerciseDetailView extends StatelessWidget {
               ? 'Open Camera Guide'
               : 'Start Manual Demo',
           icon: Icons.play_arrow,
+          expand: true,
           onPressed: () => context.push('/exercises/${exercise.id}/live'),
         ),
       ],

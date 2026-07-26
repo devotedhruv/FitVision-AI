@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     DB_POOL_TIMEOUT: int = Field(default=30, ge=1, le=300)
     DB_ECHO: bool = False
     DOCS_ENABLED: bool = True
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_REQUESTS: int = Field(default=120, ge=1, le=10000)
+    RATE_LIMIT_WINDOW_SECONDS: int = Field(default=60, ge=1, le=3600)
+    RATE_LIMIT_BUCKET_CAPACITY: int = Field(default=10000, ge=100, le=1000000)
 
     @field_validator("APP_ENV")
     @classmethod

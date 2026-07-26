@@ -97,6 +97,17 @@ class ApiClient {
     }
   }
 
+  Future<void> delete(String path) async {
+    try {
+      await _dio.delete<void>(path);
+    } on DioException catch (error) {
+      throw AppException(
+        _mapDioFailure(error),
+        cause: error.response?.statusCode ?? error.type,
+      );
+    }
+  }
+
   Failure _mapDioFailure(DioException error) {
     return switch (error.type) {
       DioExceptionType.connectionTimeout ||

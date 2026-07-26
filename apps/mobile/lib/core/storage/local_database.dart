@@ -32,6 +32,27 @@ class LocalDatabase extends _$LocalDatabase {
   int get schemaVersion => DatabaseMigrations.schemaVersion;
   @override
   MigrationStrategy get migration => DatabaseMigrations.strategy(this);
+
+  Future<void> deleteUserData(String userId) => transaction(() async {
+    await customStatement(
+      'DELETE FROM sync_queue_items WHERE entity_local_id IN '
+      '(SELECT local_id FROM rep_events WHERE workout_local_id IN '
+      '(SELECT local_id FROM workout_sessions WHERE user_id = ?)) '
+      'OR entity_local_id IN (SELECT local_id FROM running_points WHERE '
+      'running_session_local_id IN (SELECT local_id FROM running_sessions '
+      'WHERE user_id = ?)) OR entity_local_id IN '
+      '(SELECT local_id FROM workout_sessions WHERE user_id = ?) '
+      'OR entity_local_id IN (SELECT local_id FROM running_sessions '
+      'WHERE user_id = ?)',
+      [userId, userId, userId, userId],
+    );
+    await customStatement('DELETE FROM workout_sessions WHERE user_id = ?', [
+      userId,
+    ]);
+    await customStatement('DELETE FROM running_sessions WHERE user_id = ?', [
+      userId,
+    ]);
+  });
 }
 
 QueryExecutor _openConnection() => LazyDatabase(() async {

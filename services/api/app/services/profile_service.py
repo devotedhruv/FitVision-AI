@@ -22,3 +22,10 @@ class ProfileService:
             fallback = user.email.split("@")[0] if user.email else "FitVision User"
             profile = await self.repository.ensure(user.user_id, fallback[:100])
             return await self.repository.update(profile, data)
+
+    async def delete_owned_data(self, user: CurrentUserClaims) -> None:
+        """Transactionally remove the API profile and every cascaded child row."""
+        async with self.session.begin():
+            profile = await self.repository.get(user.user_id)
+            if profile is not None:
+                await self.repository.delete(profile)

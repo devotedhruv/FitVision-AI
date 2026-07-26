@@ -6,6 +6,8 @@ import 'running_providers.dart';
 import 'widgets/route_map.dart';
 import 'widgets/pace_display.dart';
 import 'widgets/running_controls.dart';
+import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
 
 class LiveRunningView extends ConsumerWidget {
   const LiveRunningView({super.key});
@@ -23,20 +25,32 @@ class LiveRunningView extends ConsumerWidget {
           ),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.md),
           children: [
             RouteMap(points: s?.routePoints ?? const []),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _metric(
-                  context,
-                  'Distance',
-                  '${(m.totalAcceptedDistanceMeters / 1000).toStringAsFixed(2)} km',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _metric(
+                        context,
+                        'Distance',
+                        '${(m.totalAcceptedDistanceMeters / 1000).toStringAsFixed(2)} km',
+                      ),
+                    ),
+                    Expanded(
+                      child: _metric(
+                        context,
+                        'Active time',
+                        _duration(m.activeDuration),
+                      ),
+                    ),
+                  ],
                 ),
-                _metric(context, 'Active time', _duration(m.activeDuration)),
-              ],
+              ),
             ),
             const SizedBox(height: 12),
             Center(child: PaceDisplay(pace: m.averagePaceSecondsPerKm)),
@@ -93,8 +107,8 @@ class LiveRunningView extends ConsumerWidget {
 
   Widget _metric(BuildContext c, String label, String value) => Column(
     children: [
-      Text(label),
-      Text(value, style: Theme.of(c).textTheme.headlineSmall),
+      Text(value, style: AppTypography.metric(c)),
+      Text(label, style: Theme.of(c).textTheme.labelMedium),
     ],
   );
   static String _duration(Duration d) =>

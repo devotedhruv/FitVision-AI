@@ -10,6 +10,7 @@ class RunningTrackingConfig {
     this.maximumTimestampGap = const Duration(seconds: 15),
     this.minimumPaceDistanceMeters = 20,
     this.speedSmoothingAlpha = .35,
+    this.accuracyNoiseMultiplier = .5,
     this.checkpointInterval = const Duration(seconds: 10),
     this.maximumPointsPerSyncBatch = 250,
   });
@@ -18,7 +19,8 @@ class RunningTrackingConfig {
       maximumAcceptedAccuracyMeters,
       maximumPlausibleSpeedMps,
       minimumPaceDistanceMeters,
-      speedSmoothingAlpha;
+      speedSmoothingAlpha,
+      accuracyNoiseMultiplier;
   final int maximumPointsPerSyncBatch;
 }
 
@@ -78,7 +80,13 @@ class GpsFilter {
       point.latitude,
       point.longitude,
     );
-    if (distance < config.minimumDisplacementMeters) {
+    final noiseFloor =
+        ((anchor.horizontalAccuracy + point.horizontalAccuracy) / 2) *
+        config.accuracyNoiseMultiplier;
+    if (distance <
+        (noiseFloor > config.minimumDisplacementMeters
+            ? noiseFloor
+            : config.minimumDisplacementMeters)) {
       return const GpsFilterResult(false, GpsRejectionReason.duplicatePoint, 0);
     }
     final seconds =

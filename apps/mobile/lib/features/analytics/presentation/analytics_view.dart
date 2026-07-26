@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/running/domain/calculations/pace_calculator.dart';
+import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
 import '../data/analytics_providers.dart';
 import 'analytics_view_model.dart';
 import 'widgets/analytics_period_selector.dart';
@@ -36,8 +38,11 @@ class AnalyticsView extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => vm.load(refresh: true),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.md),
           children: [
+            Text('Your progress', style: AppTypography.pageTitle(context)),
+            const Text('Trends are calculated only from your saved activity.'),
+            const SizedBox(height: AppSpacing.md),
             AnalyticsPeriodSelector(
               value: vm.selected,
               onChanged: vm.selectPeriod,
@@ -53,6 +58,7 @@ class AnalyticsView extends ConsumerWidget {
               ],
               onChanged: vm.selectExercise,
             ),
+            const SizedBox(height: AppSpacing.md),
             if (vm.state == AnalyticsLoadState.loading)
               const Padding(
                 padding: EdgeInsets.all(48),

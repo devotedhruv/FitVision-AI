@@ -19,10 +19,25 @@ class ExerciseCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: Text(exercise.illustration),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primaryContainer,
+                      Theme.of(context).colorScheme.secondaryContainer,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(AppRadius.large),
+                ),
+                child: Icon(
+                  _iconFor(exercise.category),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  size: 32,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -35,19 +50,56 @@ class ExerciseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxs),
                     Text(
-                      '${exercise.targetMuscles.join(' • ')}\n'
-                      '${exercise.estimatedDuration.inMinutes} min',
-                      maxLines: 2,
+                      exercise.targetMuscles.join(' • '),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      children: [
+                        _Meta(
+                          icon: Icons.timer_outlined,
+                          label: '${exercise.estimatedDuration.inMinutes} min',
+                        ),
+                        _Meta(
+                          icon: Icons.signal_cellular_alt,
+                          label: exercise.difficultyLabel,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Chip(label: Text(exercise.difficultyLabel)),
+              const SizedBox(width: AppSpacing.xs),
+              const Icon(Icons.chevron_right),
             ],
           ),
         ),
       ),
     ),
+  );
+
+  IconData _iconFor(ExerciseCategory category) => switch (category) {
+    ExerciseCategory.strength => Icons.fitness_center,
+    ExerciseCategory.mobility => Icons.accessibility_new,
+    ExerciseCategory.cardio => Icons.monitor_heart_outlined,
+    ExerciseCategory.core => Icons.self_improvement,
+  };
+}
+
+class _Meta extends StatelessWidget {
+  const _Meta({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
+      const SizedBox(width: AppSpacing.xxs),
+      Text(label, style: Theme.of(context).textTheme.labelSmall),
+    ],
   );
 }

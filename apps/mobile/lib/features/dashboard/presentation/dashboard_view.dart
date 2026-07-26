@@ -9,7 +9,6 @@ import 'package:fitvision_ai/features/exercise/data/exercise_mock_repository.dar
 import 'package:fitvision_ai/shared/widgets/error_view.dart';
 import 'package:fitvision_ai/shared/widgets/exercise_card.dart';
 import 'package:fitvision_ai/shared/widgets/loading_indicator.dart';
-import 'package:fitvision_ai/shared/widgets/primary_button.dart';
 import 'package:fitvision_ai/shared/widgets/section_header.dart';
 import 'package:fitvision_ai/shared/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,16 @@ class DashboardView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(dashboardSummaryProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          IconButton(
+            tooltip: 'Open profile',
+            onPressed: () => context.go('/profile'),
+            icon: const Icon(Icons.account_circle_outlined),
+          ),
+        ],
+      ),
       body: summary.when(
         loading: () => const LoadingIndicator(label: 'Loading dashboard'),
         error: (error, stack) => ErrorView(
@@ -69,11 +77,7 @@ class _DashboardContent extends StatelessWidget {
           ),
           Text(DateTimeFormatter.friendlyDate(DateTime.now())),
           const SizedBox(height: AppSpacing.lg),
-          PrimaryButton(
-            label: 'Start Workout',
-            icon: AppIcons.exercises,
-            onPressed: () => context.go('/exercises'),
-          ),
+          _CoachHero(onStart: () => context.go('/exercises')),
           const SizedBox(height: AppSpacing.lg),
           const SectionHeader(title: 'Today’s activity'),
           LayoutBuilder(
@@ -121,18 +125,53 @@ class _DashboardContent extends StatelessWidget {
             },
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Weekly goal: ${summary.weeklyCompleted} of ${summary.weeklyGoal} workouts',
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Semantics(
-            label:
-                'Weekly goal ${summary.weeklyCompleted} of ${summary.weeklyGoal}',
-            child: LinearProgressIndicator(
-              value: summary.weeklyGoal == 0
-                  ? 0
-                  : summary.weeklyCompleted / summary.weeklyGoal,
-              minHeight: AppSpacing.xs,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(child: Text('Weekly goal')),
+                      Text(
+                        '${summary.weeklyCompleted} of ${summary.weeklyGoal} workouts',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Semantics(
+                          label:
+                              'Weekly goal ${summary.weeklyCompleted} of ${summary.weeklyGoal}',
+                          child: TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 300),
+                            tween: Tween(
+                              end: summary.weeklyGoal == 0
+                                  ? 0
+                                  : summary.weeklyCompleted /
+                                        summary.weeklyGoal,
+                            ),
+                            builder: (context, value, _) =>
+                                LinearProgressIndicator(
+                                  value: value.clamp(0, 1),
+                                  minHeight: AppSpacing.xs,
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.pill,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        '${summary.weeklyGoal == 0 ? 0 : (summary.weeklyCompleted / summary.weeklyGoal * 100).round()}%',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -179,6 +218,65 @@ class _DashboardContent extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CoachHero extends StatelessWidget {
+  const _CoachHero({required this.onStart});
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(AppSpacing.lg),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Theme.of(context).colorScheme.surfaceContainerLow,
+          Theme.of(context).colorScheme.primaryContainer.withValues(alpha: .5),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(AppRadius.extraLarge),
+      border: Border.all(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: .7),
+      ),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Chip(
+          avatar: const Icon(Icons.auto_awesome, size: 16),
+          label: const Text('AI Coach'),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Track. Improve. Achieve.',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          'Smart exercise detection with real-time posture analysis and feedback.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          ),
+          onPressed: onStart,
+          icon: const Icon(AppIcons.exercises),
+          label: const Text('Start Workout'),
+        ),
+      ],
+    ),
+  );
 }
 
 class _EmptyDashboard extends StatelessWidget {

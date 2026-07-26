@@ -29,3 +29,7 @@ class ProfileRepository:
             setattr(profile, field, str(value) if field == "avatar_url" and value else value)
         await self.session.flush()
         return profile
+
+    async def delete(self, profile: Profile) -> None:
+        """Delete the profile; database cascades remove all owned sessions."""
+        await self.session.delete(profile)

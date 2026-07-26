@@ -1,19 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fitvision_ai/core/storage/local_database.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsView extends StatefulWidget {
+class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  ConsumerState<SettingsView> createState() => _SettingsViewState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class _SettingsViewState extends ConsumerState<SettingsView> {
   bool audio = true;
   bool haptics = true;
   bool frontCamera = true;
   bool debugOverlay = false;
+  bool deleting = false;
 
   @override
   void initState() {
@@ -84,6 +89,16 @@ class _SettingsViewState extends State<SettingsView> {
             'or saved by default.',
           ),
         ),
+        ListTile(
+          leading: const Icon(Icons.delete_forever_outlined),
+          title: const Text('Delete workout and running history'),
+          subtitle: const Text(
+            'Permanently removes synced history, routes, rep events and the '
+            'local copies on this device. Your sign-in account remains.',
+          ),
+          enabled: !deleting,
+          onTap: _confirmDeleteHistory,
+        ),
         const AboutListTile(
           applicationName: 'FitVision AI',
           applicationVersion: '1.0.0 (Phase 4)',
@@ -93,4 +108,50 @@ class _SettingsViewState extends State<SettingsView> {
       ],
     ),
   );
+
+  Future<void> _confirmDeleteHistory() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete all history?'),
+        content: const Text(
+          'This permanently deletes every workout, rep event, run and route. '
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete history'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || deleting) return;
+    final userId = ref.read(authRepositoryProvider).currentUser?.id;
+    if (userId == null) {
+      _message('Sign in again before deleting history.');
+      return;
+    }
+    setState(() => deleting = true);
+    try {
+      await ref.read(profileRepositoryProvider).deleteRemoteData();
+      await ref.read(localDatabaseProvider).deleteUserData(userId);
+      await ref.read(profileRepositoryProvider).clearCache();
+      ref.invalidate(currentProfileProvider);
+      _message('Workout and running history deleted.');
+    } catch (_) {
+      _message('History was not deleted. Please try again.');
+    } finally {
+      if (mounted) setState(() => deleting = false);
+    }
+  }
+
+  void _message(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
 }

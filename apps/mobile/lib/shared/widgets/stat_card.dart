@@ -1,4 +1,5 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class StatCard extends StatelessWidget {
@@ -23,12 +24,25 @@ class StatCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(AppRadius.medium),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xs),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            Text(value, style: Theme.of(context).textTheme.headlineSmall),
-            Text(label),
+            Text(value, style: AppTypography.metric(context)),
+            Text(label, style: Theme.of(context).textTheme.labelLarge),
             if (helper != null)
-              Text(helper!, style: Theme.of(context).textTheme.bodySmall),
+              Text(helper!, style: AppTypography.caption(context)),
           ],
         ),
       ),

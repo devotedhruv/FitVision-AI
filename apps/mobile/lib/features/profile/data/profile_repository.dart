@@ -44,6 +44,13 @@ class ProfileRepository {
     return profile;
   }
 
+  Future<void> deleteRemoteData() => client.delete('/api/v1/users/me/data');
+
+  Future<void> clearCache() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_cacheKey);
+  }
+
   Future<void> _cache(UserProfile profile) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_cacheKey, jsonEncode(profile.toJson()));

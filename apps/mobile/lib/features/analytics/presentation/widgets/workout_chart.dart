@@ -23,10 +23,25 @@ class WorkoutChart extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text('${e.completedReps}'),
-                      Container(
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
                         height: 100 * e.completedReps / max,
                         width: 28,
-                        color: Theme.of(context).colorScheme.primary,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: .32),
+                            ],
+                          ),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(8),
+                          ),
+                        ),
                       ),
                       Text(e.exerciseType),
                     ],

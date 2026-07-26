@@ -1,0 +1,13 @@
+version: 1
+splits:
+  calibration: ai/evaluation/private/calibration
+  holdout: ai/evaluation/private/holdout
+  regression: ai/evaluation/test_cases/regression.json
+quality_gates:
+  exact_rep_agreement: 0.95
+  mean_absolute_rep_error: 0.20
+  duplicate_rep_rate: 0.01
+  incomplete_precision: 0.90
+  incomplete_recall: 0.90
+  gps_distance_error_percent: 5.0
+note: Provisional targets; private calibration and locked holdout measurements are not committed.

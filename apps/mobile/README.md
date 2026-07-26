@@ -4,6 +4,20 @@
 
 Running requires precise foreground location and Android notification permission. Tracking is started only from Running Setup. Generate Drift schema v2 with `dart run build_runner build`, then run `flutter analyze` and `flutter test`. Pending runs are visible in `sync_queue_items` with entity type `running_session`.
 
+The live route uses Google Maps and Android's fused high-accuracy location
+provider. Enable **Maps SDK for Android** in Google Cloud, restrict the key to
+the Android application ID `com.fitvisionai.fitvision_ai` plus the signing
+certificate SHA-1, and add this untracked entry to
+`android/local.properties`:
+
+```properties
+MAPS_API_KEY=YOUR_ANDROID_MAPS_API_KEY
+```
+
+The app accepts only accurate, plausible points. Rejected points do not change
+distance or the polyline, and a new polyline segment begins after resume so
+movement during a pause is never drawn as a direct jump.
+
 ## Phase 8 history and analytics
 
 History and analytics read completed user-scoped rows from Drift, work offline, and include unsynced sessions. Analytics uses deterministic calculators and fixed insight codes; no LLM configuration is required. See `docs/phases/phase-08-history-analytics/analytics-specification.md` for formulas.

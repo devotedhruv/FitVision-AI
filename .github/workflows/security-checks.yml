@@ -1,0 +1,14 @@
+name: Security checks
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - run: python scripts/security_scan.py --history
+      - run: python -m pytest -q ai/evaluation/test_evaluation_metrics.py
+      - name: Forbid private evaluation media
+        run: '! git ls-files | grep -E "\\.(mp4|mov|avi|mkv)$"'

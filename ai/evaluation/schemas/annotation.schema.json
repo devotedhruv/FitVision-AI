@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fitvision.local/schemas/annotation-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "sampleId", "exerciseType", "split", "expectedCompleteRepCount", "expectedIncompleteRepCount", "repRanges", "formLabels", "visibilityLossIntervals", "cameraPosition", "distanceCategory", "lightingCategory", "repetitionSpeed", "deviceCategory"],
+  "properties": {
+    "annotationVersion": {"const": "1.0.0"},
+    "sampleId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$"},
+    "exerciseType": {"enum": ["squat", "curl", "pushup"]},
+    "split": {"enum": ["calibration", "holdout", "regression"]},
+    "expectedCompleteRepCount": {"type": "integer", "minimum": 0},
+    "expectedIncompleteRepCount": {"type": "integer", "minimum": 0},
+    "repRanges": {"type": "array", "items": {"type": "object", "required": ["startMs", "endMs", "complete"], "properties": {"startMs": {"type": "integer", "minimum": 0}, "endMs": {"type": "integer", "minimum": 0}, "complete": {"type": "boolean"}}, "additionalProperties": false}},
+    "formLabels": {"type": "array", "items": {"type": "string", "maxLength": 64}},
+    "visibilityLossIntervals": {"type": "array", "items": {"type": "array", "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}], "minItems": 2, "maxItems": 2}},
+    "cameraPosition": {"enum": ["front", "left_side", "right_side", "offset", "unsupported"]},
+    "distanceCategory": {"enum": ["near", "supported", "far", "partial_frame"]},
+    "lightingCategory": {"enum": ["bright", "normal", "dim", "backlit", "uneven"]},
+    "repetitionSpeed": {"enum": ["slow", "normal", "fast_controlled", "hold"]},
+    "deviceCategory": {"type": "string", "maxLength": 64},
+    "annotatorNotes": {"type": "string", "maxLength": 500}
+  }
+}

@@ -118,6 +118,16 @@ mlruns/
 *.ckpt
 *.h5
 
+# Private calibration media and participant data (manifests stay versioned)
+ai/evaluation/private/
+ai/evaluation/raw/
+ai/evaluation/**/*.mp4
+ai/evaluation/**/*.mov
+ai/evaluation/**/*.avi
+ai/evaluation/**/*.mkv
+ai/evaluation/**/*.jpg
+ai/evaluation/**/*.jpeg
+
 # Local containers and tooling
 .docker/
 docker-compose.override.yml

@@ -85,6 +85,33 @@ class _ExerciseListViewState extends ConsumerState<ExerciseListView> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
+                if (!isOffline)
+                  SizedBox(
+                    height: 44,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _CategoryChip(
+                          label: 'All',
+                          icon: Icons.apps,
+                          selected: _category == null,
+                          onSelected: () => setState(() => _category = null),
+                        ),
+                        for (final value in ExerciseCategory.values)
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xs),
+                            child: _CategoryChip(
+                              label: _label(value.name),
+                              icon: _categoryIcon(value),
+                              selected: _category == value,
+                              onSelected: () =>
+                                  setState(() => _category = value),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                if (!isOffline) const SizedBox(height: AppSpacing.sm),
                 DropdownButtonFormField<ExerciseCategory?>(
                   key: const Key('category-filter'),
                   initialValue: _category,
@@ -141,6 +168,35 @@ class _ExerciseListViewState extends ConsumerState<ExerciseListView> {
 
   String _label(String value) =>
       '${value[0].toUpperCase()}${value.substring(1)}';
+
+  IconData _categoryIcon(ExerciseCategory category) => switch (category) {
+    ExerciseCategory.strength => Icons.fitness_center,
+    ExerciseCategory.mobility => Icons.accessibility_new,
+    ExerciseCategory.cardio => Icons.favorite_border,
+    ExerciseCategory.core => Icons.self_improvement,
+  };
+}
+
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onSelected,
+  });
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) => FilterChip(
+    selected: selected,
+    onSelected: (_) => onSelected(),
+    avatar: Icon(icon, size: 16),
+    label: Text(label),
+    showCheckmark: false,
+  );
 }
 
 class _CatalogueEmpty extends StatelessWidget {

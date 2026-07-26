@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../domain/models/running_status.dart';
 import 'running_providers.dart';
+import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
+import 'package:fitvision_ai/core/design_system/app_colors.dart';
 
 class RunningSetupView extends ConsumerStatefulWidget {
   const RunningSetupView({super.key});
@@ -25,29 +28,52 @@ class _State extends ConsumerState<RunningSetupView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Running setup')),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          const Icon(Icons.location_on_outlined, size: 72),
-          const SizedBox(height: 16),
-          const Text(
-            'FitVision uses precise location only during a run to measure distance and keep tracking with the screen off.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ListTile(
-            leading: Icon(
-              precise ? Icons.check_circle : Icons.location_searching,
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(AppRadius.extraLarge),
             ),
-            title: Text(_permission(vm.permission)),
-            subtitle: Text(
-              vm.message ??
-                  'Your route is stored on this device before synchronization.',
+            child: Column(
+              children: [
+                const Icon(Icons.directions_run, size: 72),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Ready for your next run?',
+                  style: AppTypography.pageTitle(context),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                const Text(
+                  'FitVision uses precise location only during a run to measure distance and keep tracking with the screen off.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Card(
+            child: ListTile(
+              leading: Icon(
+                precise ? Icons.check_circle : Icons.location_searching,
+                color: precise
+                    ? Theme.of(context).colorScheme.primary
+                    : AppColors.warning,
+              ),
+              title: Text(_permission(vm.permission)),
+              subtitle: Text(
+                vm.message ??
+                    'Your route is stored on this device before synchronization.',
+              ),
             ),
           ),
           if (!precise)
-            FilledButton(
+            FilledButton.icon(
               onPressed: vm.busy ? null : vm.requestLocation,
-              child: const Text('Enable precise location'),
+              icon: const Icon(Icons.my_location),
+              label: const Text('Enable precise location'),
             ),
           if (vm.permission == LocationPermissionState.permanentlyDenied ||
               vm.permission ==

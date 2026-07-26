@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/design_system/app_typography.dart';
 
 class SummaryCard extends StatelessWidget {
   const SummaryCard({
@@ -12,12 +14,28 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon),
-          Text(value, style: Theme.of(context).textTheme.headlineSmall),
-          Text(label, textAlign: TextAlign.center),
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(value, style: AppTypography.metric(context)),
         ],
       ),
     ),

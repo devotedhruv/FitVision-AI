@@ -136,5 +136,23 @@ void main() {
       expect(result.accepted, isTrue);
       expect(result.distanceMeters, 0);
     });
+    test('accuracy-sized stationary drift is not added to the route', () {
+      final f = GpsFilter();
+      expect(f.evaluate(point(0, 27, 85, t, accuracy: 8)).accepted, isTrue);
+      for (var i = 1; i <= 5; i++) {
+        final jitter = i.isEven ? 0.000015 : -0.000015;
+        final result = f.evaluate(
+          point(
+            i,
+            27 + jitter,
+            85,
+            t.add(Duration(seconds: i * 2)),
+            accuracy: 8,
+          ),
+        );
+        expect(result.accepted, isFalse);
+        expect(result.distanceMeters, 0);
+      }
+    });
   });
 }

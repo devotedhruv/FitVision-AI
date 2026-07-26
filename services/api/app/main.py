@@ -11,6 +11,7 @@ from app.api.router import api_router
 from app.core.config import Settings, get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
+from app.core.request_hardening import RequestHardeningMiddleware
 from app.db.session import dispose_engine, get_engine
 
 
@@ -42,6 +43,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "Accept"],
     )
+    application.add_middleware(RequestHardeningMiddleware, settings=runtime_settings)
     application.include_router(api_router, prefix=runtime_settings.API_V1_PREFIX)
     register_exception_handlers(application)
 
