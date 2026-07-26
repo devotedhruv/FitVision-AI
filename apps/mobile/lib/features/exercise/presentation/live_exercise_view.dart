@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pose_landmarker/pose_landmarker.dart';
+import 'package:fitvision_ai/features/exercise/application/exercise_feedback_controller.dart';
 
 class LiveExerciseView extends ConsumerWidget {
   const LiveExerciseView({required this.exercise, super.key});
@@ -20,6 +21,7 @@ class LiveExerciseView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(liveExerciseProvider);
     final controller = ref.read(liveExerciseProvider.notifier);
+    controller.configureExercise(exercise.id);
     if (session.stage == LivePoseStage.guide ||
         (session.stage == LivePoseStage.error &&
             session.permission != CameraPermissionState.granted)) {
@@ -139,7 +141,7 @@ class LiveExerciseView extends ConsumerWidget {
     LiveExerciseViewModel controller,
     LivePoseSessionState state,
   ) async {
-    await controller.end();
+    final analysisResult = await controller.end();
     if (!context.mounted) return;
     context.go(
       '/exercises/${exercise.id}/result',
@@ -150,6 +152,16 @@ class LiveExerciseView extends ConsumerWidget {
         detectedFramePercentage: state.detectedFramePercentage,
         averageLatencyMs: state.averageLatencyMs,
         completed: true,
+        completedReps: analysisResult?.completedRepCount ?? 0,
+        incompleteReps: analysisResult?.incompleteRepCount ?? 0,
+        validFormReps: analysisResult?.validFormRepCount ?? 0,
+        feedbackSummary:
+            analysisResult?.feedbackSummary
+                .map(ExerciseFeedbackText.forCode)
+                .toSet()
+                .take(3)
+                .toList(growable: false) ??
+            const [],
       ),
     );
   }
@@ -291,6 +303,10 @@ class _ControlPanel extends StatelessWidget {
                 ),
               ],
             ),
+            Text(
+              state.analysis.formStatus,
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
             const SizedBox(height: AppSpacing.xs),
             Row(
               children: [
@@ -314,7 +330,7 @@ class _ControlPanel extends StatelessWidget {
                 if (!active && !paused)
                   FilledButton.icon(
                     key: const Key('start-session'),
-                    onPressed: state.fullBodyReady ? onStart : null,
+                    onPressed: state.analysisReady ? onStart : null,
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('Start'),
                   )

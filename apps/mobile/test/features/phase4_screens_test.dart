@@ -76,7 +76,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('workout result does not fabricate rep statistics', (
+  testWidgets('workout result renders measured Phase 5 statistics', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -94,7 +94,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Unavailable until Phase 5'), findsOneWidget);
+    expect(find.text('Completed reps'), findsOneWidget);
     expect(find.textContaining('75.0%'), findsOneWidget);
   });
 

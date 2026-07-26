@@ -6,8 +6,8 @@ class ExerciseAnalysisState {
     this.repCount = 0,
     this.validRepCount = 0,
     this.invalidRepCount = 0,
-    this.formStatus = 'Camera readiness only',
-    this.shortFeedback = 'Rep and form analysis begin in Phase 5.',
+    this.formStatus = 'Waiting for movement',
+    this.shortFeedback = 'Move fully into position',
   });
 
   final ExerciseStage stage;

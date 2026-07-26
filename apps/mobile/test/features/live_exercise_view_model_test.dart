@@ -117,6 +117,19 @@ void main() {
     });
   });
 
+  test('push-up can start when one arm is visible without full lower body', () {
+    container.read(liveExerciseProvider.notifier)
+      ..configureExercise('push-up')
+      ..prepareCameraForTest()
+      ..onPoseResult(_result(PoseStatus.partialPose, lowLowerBody: true));
+
+    expect(container.read(liveExerciseProvider).analysisReady, isTrue);
+    expect(
+      container.read(liveExerciseProvider).stage,
+      LivePoseStage.positioning,
+    );
+  });
+
   test('tracking loss cancels an active countdown', () {
     container.read(liveExerciseProvider.notifier)
       ..prepareCameraForTest()
@@ -267,14 +280,18 @@ void main() {
   });
 }
 
-PoseResult _result(PoseStatus status, {String? message}) => PoseResult(
+PoseResult _result(
+  PoseStatus status, {
+  String? message,
+  bool lowLowerBody = false,
+}) => PoseResult(
   timestampMs: 1,
   imageWidth: 480,
   imageHeight: 640,
   rotation: 0,
   lensDirection: CameraLensDirection.front,
   inferenceLatencyMs: 40,
-  poseDetected: status == PoseStatus.poseDetected,
+  poseDetected: status == PoseStatus.poseDetected || lowLowerBody,
   status: status,
   landmarks: List.generate(
     33,
@@ -283,8 +300,12 @@ PoseResult _result(PoseStatus status, {String? message}) => PoseResult(
       x: 0.5,
       y: 0.5,
       z: 0,
-      visibility: 0.9,
-      presence: 0.9,
+      visibility: lowLowerBody && {23, 24, 25, 26, 27, 28}.contains(index)
+          ? 0.2
+          : 0.9,
+      presence: lowLowerBody && {23, 24, 25, 26, 27, 28}.contains(index)
+          ? 0.2
+          : 0.9,
     ),
   ),
   worldLandmarks: const [],

@@ -6,11 +6,9 @@ FitVision AI is an Android-first mobile-system project for future on-device exer
 
 The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
 
-> **Current status:** Phase 4 Android CameraX/MediaPipe pose-foundation
-> implementation is present. Flutter/native tests and the configured debug APK
-> build pass. A vivo physical run verified front preview and live landmark
-> overlay; the complete permission/lifecycle/performance/ten-minute acceptance
-> run remains pending and is documented in the Phase 4 validation report.
+> **Current status:** Phase 5 deterministic exercise analysis is implemented
+> for squats, biceps curls and push-ups on top of the Phase 4 Android
+> CameraX/MediaPipe pipeline. Physical-device threshold calibration remains.
 
 The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
 
@@ -53,7 +51,9 @@ Camera frames are processed on the device. Flutter use cases coordinate the nati
 4. **Phase 4 — camera and pose foundation:** native CameraX preview, on-device
    MediaPipe Pose Landmarker, Flutter skeleton, placement guidance, countdown
    and lifecycle-safe controls.
-5. **Later phases:** exercise rules/rep counting, real GPS running, advanced
+5. **Phase 5 — exercise analysis:** pure-Dart geometry, smoothing, confidence
+   filtering, full-cycle rep state machines, form feedback and live results.
+6. **Later phases:** real GPS running, advanced
    analytics, validation and delivery.
 
 Roadmap phases after Phase 0 are planning guidance and may change through controlled review.
@@ -154,8 +154,22 @@ Debug builds show landmark indices, processed FPS and inference latency; release
 builds suppress debug data.
 
 Camera frames and raw video stay on-device and are neither uploaded nor saved
-by default. Phase 4 detects landmarks only: rep counting, UP/DOWN/HOLD stages,
-joint angles and form scoring remain Phase 5 work.
+by default. Phase 5 converts normalized landmarks into deterministic movement
+events; it does not persist raw pose coordinates.
+
+### Phase 5 exercise-engine checks
+
+```bash
+dart format packages/exercise_engine
+dart analyze packages/exercise_engine
+dart test packages/exercise_engine
+cd apps/mobile
+flutter pub get
+flutter analyze
+flutter test
+```
+
+See [Phase 5 documentation](docs/phases/phase-05-exercise-engine/README.md).
 
 ## Phase 0 Documentation
 
@@ -225,8 +239,6 @@ models, Alembic migrations, RLS policies, and core user-scoped APIs. See
 [`docs/phases/phase-03-auth-backend-database/`](docs/phases/phase-03-auth-backend-database/)
 for setup, security, schema, API, and validation details.
 
-The next phase is **Phase 5 — deterministic exercise analysis**. Its first task
-should consume the existing `ExerciseAnalysisState` boundary and implement a
-well-tested squat state machine from stable, visibility-gated landmarks before
-adding curls or push-ups. Camera code must remain independent of exercise
+The next delivery focus is physical-device calibration of Phase 5 thresholds
+and the later GPS/persistence work. Camera code remains independent of exercise
 rules.

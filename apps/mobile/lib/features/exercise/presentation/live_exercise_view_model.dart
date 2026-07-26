@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:fitvision_ai/features/exercise/data/services/camera_permission_service.dart';
+import 'package:fitvision_ai/features/exercise/data/mediapipe_pose_frame_adapter.dart';
+import 'package:fitvision_ai/features/exercise/application/exercise_feedback_controller.dart';
 import 'package:fitvision_ai/features/exercise/domain/models/live_pose_session_state.dart';
+import 'package:fitvision_ai/features/exercise/domain/models/exercise_analysis_state.dart';
+import 'package:exercise_engine/exercise_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +18,11 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
   Timer? _countdownTimer;
   Timer? _sessionTimer;
   bool _ending = false;
+  ExerciseAnalyzer? _analyzer;
+  ExerciseResult? _result;
+  final ExerciseFeedbackController _effects = ExerciseFeedbackController();
+  int _lastAnalyzedTimestamp = -1;
+  String _exerciseId = '';
 
   @override
   LivePoseSessionState build() {
@@ -21,6 +30,20 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     unawaited(_loadPreferences());
     return const LivePoseSessionState();
   }
+
+  void configureExercise(String exerciseId) {
+    if (_exerciseId == exerciseId) return;
+    _exerciseId = exerciseId;
+    _analyzer = switch (exerciseId) {
+      'squat' => SquatAnalyzer(),
+      'bicep-curl' => CurlAnalyzer(),
+      'push-up' => PushupAnalyzer(),
+      _ => null,
+    };
+    _analyzer?.reset();
+  }
+
+  ExerciseResult? get result => _result;
 
   Future<void> initializeCamera() async {
     if (state.stage != LivePoseStage.guide &&
@@ -91,11 +114,8 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     final nextDetected =
         state.detectedFrames + (isFrame && result.poseDetected ? 1 : 0);
     var nextStage = state.stage;
-    final resumeReady =
-        state.resumingSession &&
-        result.status == PoseStatus.poseDetected &&
-        result.poseDetected &&
-        result.landmarks.length == 33;
+    final exerciseReady = _isExerciseReady(result);
+    final resumeReady = state.resumingSession && exerciseReady;
     if (resumeReady) {
       nextStage = LivePoseStage.active;
     } else if (!state.resumingSession &&
@@ -104,8 +124,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       nextStage = LivePoseStage.positioning;
     }
     final countdownLostTracking =
-        nextStage == LivePoseStage.countdown &&
-        result.status != PoseStatus.poseDetected;
+        nextStage == LivePoseStage.countdown && !exerciseReady;
     if (countdownLostTracking) {
       _cancelCountdown();
       nextStage = LivePoseStage.positioning;
@@ -119,19 +138,64 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       totalFrames: nextTotal,
       totalLatencyMs:
           state.totalLatencyMs + (isFrame ? result.inferenceLatencyMs : 0),
+      analysisReady: exerciseReady,
       feedback: resumeReady
           ? 'Tracking restored. Session resumed.'
+          : exerciseReady
+          ? 'Required landmarks detected. Ready to start.'
           : _feedbackFor(result),
     );
+    if (nextStage == LivePoseStage.active && !resumeReady) {
+      _processAnalysis(result);
+    }
     if (resumeReady) _startSessionTimer();
   }
 
+  void _processAnalysis(PoseResult result) {
+    final analyzer = _analyzer;
+    if (analyzer == null || result.timestampMs - _lastAnalyzedTimestamp < 66) {
+      return;
+    }
+    _lastAnalyzedTimestamp = result.timestampMs;
+    final output = analyzer.processFrame(
+      MediaPipePoseFrameAdapter.convert(result),
+    );
+    final shortFeedback = output.feedbackCodes.isEmpty
+        ? state.analysis.shortFeedback
+        : ExerciseFeedbackText.forCode(output.feedbackCodes.first);
+    state = state.copyWith(
+      analysis: ExerciseAnalysisState(
+        stage: switch (output.stageLabel) {
+          'UP' => ExerciseStage.up,
+          'DOWN' => ExerciseStage.down,
+          'HOLD' => ExerciseStage.hold,
+          _ => ExerciseStage.ready,
+        },
+        repCount: output.totalCompletedReps,
+        validRepCount:
+            output.totalCompletedReps -
+            (output.completedRep?.formValid == false ? 1 : 0),
+        invalidRepCount: output.completedRep?.formValid == false ? 1 : 0,
+        formStatus: output.trackingStatus.accepted
+            ? (output.formValid ? 'FORM OK' : 'ADJUST FORM')
+            : 'TRACKING',
+        shortFeedback: shortFeedback,
+      ),
+      feedback: shortFeedback,
+    );
+    unawaited(
+      _effects.handle(
+        output.feedbackCodes,
+        audio: state.audioEnabled,
+        haptics: state.hapticsEnabled,
+        active: state.stage == LivePoseStage.active,
+      ),
+    );
+  }
+
   void startCountdown({Duration tickDuration = const Duration(seconds: 1)}) {
-    if (state.stage != LivePoseStage.positioning || !state.fullBodyReady) {
-      state = state.copyWith(
-        feedback:
-            'Move back until shoulders, hips, knees and ankles are visible.',
-      );
+    if (state.stage != LivePoseStage.positioning || !state.analysisReady) {
+      state = state.copyWith(feedback: _positioningGuidance);
       return;
     }
     _countdownTimer?.cancel();
@@ -151,8 +215,13 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
         state = state.copyWith(
           stage: LivePoseStage.active,
           clearCountdown: true,
-          feedback: 'Tracking active. Rep analysis begins in Phase 5.',
+          feedback: _analyzer == null
+              ? 'Pose tracking active. This exercise is not analyzed yet.'
+              : 'Tracking active. Begin when ready.',
         );
+        _analyzer?.reset();
+        _result = null;
+        _lastAnalyzedTimestamp = -1;
         _startSessionTimer();
       }
     });
@@ -171,6 +240,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
   Future<void> pause() async {
     if (state.stage != LivePoseStage.active) return;
     _sessionTimer?.cancel();
+    _analyzer?.pause();
     await PoseLandmarkerController.instance.pause();
     if (!ref.mounted) return;
     state = state.copyWith(
@@ -188,6 +258,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       clearPose: true,
       feedback: 'Revalidating camera and pose model.',
     );
+    _analyzer?.resume();
     await PoseLandmarkerController.instance.resume();
   }
 
@@ -206,11 +277,14 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     );
   }
 
-  Future<void> end() async {
-    if (_ending) return;
+  Future<ExerciseResult?> end() async {
+    if (_ending) return _result;
     _ending = true;
     _cancelCountdown();
     _sessionTimer?.cancel();
+    _result = _analyzer?.finishSession(
+      Duration(milliseconds: state.latestPose?.timestampMs ?? 0),
+    );
     await PoseLandmarkerController.instance.dispose();
     if (ref.mounted) {
       state = state.copyWith(
@@ -222,6 +296,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       );
     }
     _ending = false;
+    return _result;
   }
 
   Future<void> openSettings() => _permissions.openApplicationSettings();
@@ -247,6 +322,29 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     PoseStatus.paused => 'Pose detection paused.',
     _ => result.message ?? 'Hold still while tracking initializes.',
   };
+
+  String get _positioningGuidance => switch (_exerciseId) {
+    'push-up' => 'Keep one shoulder, elbow and wrist clearly visible.',
+    'bicep-curl' => 'Keep one complete arm clearly visible.',
+    'squat' => 'Keep one hip, knee and ankle clearly visible.',
+    _ => 'Move fully into the camera frame.',
+  };
+
+  bool _isExerciseReady(PoseResult result) {
+    if (!result.poseDetected || result.landmarks.length != 33) return false;
+    const threshold = .60;
+    bool visible(int index) =>
+        result.landmarks[index].visibility >= threshold &&
+        result.landmarks[index].presence >= threshold;
+    bool eitherSide(List<int> left, List<int> right) =>
+        left.every(visible) || right.every(visible);
+    return switch (_exerciseId) {
+      'push-up' ||
+      'bicep-curl' => eitherSide(const [11, 13, 15], const [12, 14, 16]),
+      'squat' => eitherSide(const [23, 25, 27], const [24, 26, 28]),
+      _ => result.status == PoseStatus.poseDetected,
+    };
+  }
 
   void _countFeedback() {
     if (state.hapticsEnabled) unawaited(HapticFeedback.mediumImpact());
