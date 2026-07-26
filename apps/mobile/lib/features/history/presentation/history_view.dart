@@ -1,79 +1,69 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
 import 'package:fitvision_ai/core/utils/date_time_formatter.dart';
-import 'package:fitvision_ai/features/history/models/workout_history_item.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/exercise/data/workout_providers.dart';
+import 'package:fitvision_ai/features/exercise/domain/models/workout_session.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HistoryView extends StatefulWidget {
+class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
   @override
-  State<HistoryView> createState() => _HistoryViewState();
-}
-
-class _HistoryViewState extends State<HistoryView> {
-  bool _completedOnly = false;
-  static final _items = [
-    WorkoutHistoryItem(
-      date: DateTime.now(),
-      exerciseName: 'Squat',
-      duration: const Duration(minutes: 8),
-      repetitions: 10,
-      status: WorkoutStatus.completed,
-      demoFormScore: 84,
-    ),
-    WorkoutHistoryItem(
-      date: DateTime.now().subtract(const Duration(days: 2)),
-      exerciseName: 'Push-up',
-      duration: const Duration(minutes: 5),
-      repetitions: 6,
-      status: WorkoutStatus.stopped,
-      demoFormScore: 72,
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final shown = _items
-        .where(
-          (item) => !_completedOnly || item.status == WorkoutStatus.completed,
-        )
-        .toList();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authRepositoryProvider).currentUser;
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Sign in to view workout history.')),
+      );
+    }
+    final history = ref.watch(workoutHistoryProvider(user.id));
     return Scaffold(
       appBar: AppBar(title: const Text('History')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          FilterChip(
-            label: const Text('Completed only'),
-            selected: _completedOnly,
-            onSelected: (value) => setState(() => _completedOnly = value),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (shown.isEmpty)
-            const Center(child: Text('No workouts match this filter.'))
-          else
-            for (final item in shown) ...[
-              Text(
-                DateTimeFormatter.shortDate(item.date),
-                style: Theme.of(context).textTheme.titleMedium,
+      body: history.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, _) => const Center(
+          child: Text('Local workout history could not be loaded.'),
+        ),
+        data: (items) => items.isEmpty
+            ? const Center(child: Text('No saved workouts yet.'))
+            : ListView(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                children: [
+                  for (final item in items)
+                    Card(
+                      child: ListTile(
+                        leading: Icon(
+                          item.status == WorkoutSessionStatus.completed
+                              ? Icons.check_circle_outline
+                              : Icons.pause_circle_outline,
+                        ),
+                        title: Text(_exerciseName(item.exerciseType)),
+                        subtitle: Text(
+                          '${DateTimeFormatter.shortDate(item.startedAt.toLocal())} • ${item.accumulatedActiveDuration.inMinutes} min • ${item.completedRepCount} reps',
+                        ),
+                        trailing: _syncIcon(item.syncState),
+                      ),
+                    ),
+                ],
               ),
-              Card(
-                child: ListTile(
-                  leading: Icon(
-                    item.status == WorkoutStatus.completed
-                        ? Icons.check_circle_outline
-                        : Icons.stop_circle_outlined,
-                  ),
-                  title: Text(item.exerciseName),
-                  subtitle: Text(
-                    '${item.duration.inMinutes} min • ${item.repetitions} reps\n'
-                    '${item.status.name} • Demo form score ${item.demoFormScore}%',
-                  ),
-                  isThreeLine: true,
-                ),
-              ),
-            ],
-        ],
       ),
     );
   }
+
+  String _exerciseName(WorkoutExerciseType type) => switch (type) {
+    WorkoutExerciseType.squat => 'Squat',
+    WorkoutExerciseType.curl => 'Bicep curl',
+    WorkoutExerciseType.pushup => 'Push-up',
+  };
+  Widget _syncIcon(WorkoutSyncState state) => Tooltip(
+    message: state == WorkoutSyncState.synced ? 'Synced' : 'Saved on device',
+    child: Icon(
+      state == WorkoutSyncState.synced
+          ? Icons.cloud_done_outlined
+          : state == WorkoutSyncState.failed ||
+                state == WorkoutSyncState.conflict
+          ? Icons.cloud_off_outlined
+          : Icons.cloud_upload_outlined,
+    ),
+  );
 }

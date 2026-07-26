@@ -32,6 +32,8 @@ class LivePoseSessionState {
     this.totalLatencyMs = 0,
     this.analysis = const ExerciseAnalysisState(),
     this.analysisReady = false,
+    this.localSaving = false,
+    this.workoutLocalId,
   });
 
   final LivePoseStage stage;
@@ -50,6 +52,8 @@ class LivePoseSessionState {
   final double totalLatencyMs;
   final ExerciseAnalysisState analysis;
   final bool analysisReady;
+  final bool localSaving;
+  final String? workoutLocalId;
 
   double get detectedFramePercentage =>
       totalFrames == 0 ? 0 : detectedFrames * 100 / totalFrames;
@@ -78,6 +82,8 @@ class LivePoseSessionState {
     double? totalLatencyMs,
     ExerciseAnalysisState? analysis,
     bool? analysisReady,
+    bool? localSaving,
+    String? workoutLocalId,
   }) => LivePoseSessionState(
     stage: stage ?? this.stage,
     permission: permission ?? this.permission,
@@ -95,6 +101,8 @@ class LivePoseSessionState {
     totalLatencyMs: totalLatencyMs ?? this.totalLatencyMs,
     analysis: analysis ?? this.analysis,
     analysisReady: analysisReady ?? this.analysisReady,
+    localSaving: localSaving ?? this.localSaving,
+    workoutLocalId: workoutLocalId ?? this.workoutLocalId,
   );
 }
 
@@ -110,6 +118,8 @@ class WorkoutResultData {
     this.incompleteReps = 0,
     this.validFormReps = 0,
     this.feedbackSummary = const [],
+    this.workoutLocalId,
+    this.syncState = 'pending',
   });
 
   final String exerciseName;
@@ -122,4 +132,6 @@ class WorkoutResultData {
   final int incompleteReps;
   final int validFormReps;
   final List<String> feedbackSummary;
+  final String? workoutLocalId;
+  final String syncState;
 }

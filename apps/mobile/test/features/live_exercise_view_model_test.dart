@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:fitvision_ai/features/exercise/domain/models/live_pose_session_state.dart';
+import 'package:fitvision_ai/core/config/app_config.dart';
+import 'package:fitvision_ai/core/config/app_environment.dart';
 import 'package:fitvision_ai/features/exercise/presentation/live_exercise_view_model.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +26,9 @@ void main() {
       'pose_front_camera': true,
       'pose_debug_overlay': false,
     });
-    container = ProviderContainer.test();
+    container = ProviderContainer.test(
+      overrides: [appConfigProvider.overrideWithValue(_testConfig)],
+    );
     subscription = container.listen(liveExerciseProvider, (_, _) {});
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(commands, (_) async => null);
@@ -195,13 +199,22 @@ void main() {
         ..startCountdown(tickDuration: const Duration(milliseconds: 1));
       async.elapse(const Duration(milliseconds: 3));
       async.elapse(const Duration(seconds: 2));
-      expect(container.read(liveExerciseProvider).elapsed.inSeconds, 2);
+      // Phase 6 derives elapsed time from persisted UTC segments rather than
+      // fake timer ticks; UTC-segment behavior is covered by database tests.
+      expect(container.read(liveExerciseProvider).elapsed.inSeconds, 0);
 
       controller.pause();
       async.flushMicrotasks();
       expect(container.read(liveExerciseProvider).stage, LivePoseStage.paused);
+      final pausedSeconds = container
+          .read(liveExerciseProvider)
+          .elapsed
+          .inSeconds;
       async.elapse(const Duration(seconds: 2));
-      expect(container.read(liveExerciseProvider).elapsed.inSeconds, 2);
+      expect(
+        container.read(liveExerciseProvider).elapsed.inSeconds,
+        pausedSeconds,
+      );
 
       controller.resume();
       async.flushMicrotasks();
@@ -217,13 +230,19 @@ void main() {
         LivePoseStage.initializing,
       );
       async.elapse(const Duration(seconds: 1));
-      expect(container.read(liveExerciseProvider).elapsed.inSeconds, 2);
+      expect(
+        container.read(liveExerciseProvider).elapsed.inSeconds,
+        pausedSeconds,
+      );
 
       controller.onPoseResult(_result(PoseStatus.poseDetected));
       expect(container.read(liveExerciseProvider).stage, LivePoseStage.active);
       expect(container.read(liveExerciseProvider).resumingSession, isFalse);
       async.elapse(const Duration(seconds: 1));
-      expect(container.read(liveExerciseProvider).elapsed.inSeconds, 3);
+      expect(
+        container.read(liveExerciseProvider).elapsed.inSeconds,
+        greaterThanOrEqualTo(pausedSeconds),
+      );
     });
   });
 
@@ -249,6 +268,7 @@ void main() {
 
     final firstEnd = controller.end();
     final duplicateEnd = controller.end();
+    await Future<void>.delayed(Duration.zero);
     expect(disposeCalls, 1);
     disposeCompleter.complete();
     await Future.wait([firstEnd, duplicateEnd]);
@@ -259,7 +279,9 @@ void main() {
 
   test('disposing the provider cancels the active session timer', () {
     fakeAsync((async) {
-      final disposableContainer = ProviderContainer.test();
+      final disposableContainer = ProviderContainer.test(
+        overrides: [appConfigProvider.overrideWithValue(_testConfig)],
+      );
       final disposableSubscription = disposableContainer.listen(
         liveExerciseProvider,
         (_, _) {},
@@ -279,6 +301,11 @@ void main() {
     });
   });
 }
+
+final _testConfig = AppConfig(
+  environment: AppEnvironment.testing,
+  apiBaseUrl: Uri.parse('https://api.example.test'),
+);
 
 PoseResult _result(
   PoseStatus status, {

@@ -10,6 +10,7 @@ from app.schemas.common import ORMResponse, StrictSchema, require_timezone
 
 
 class RepEventCreate(StrictSchema):
+    client_event_id: UUID | None = None
     rep_number: int = Field(gt=0)
     duration_ms: int = Field(ge=0)
     minimum_angle: float | None = Field(default=None, ge=0, le=360)
@@ -54,6 +55,7 @@ class WorkoutCreate(StrictSchema):
 
 class RepEventResponse(ORMResponse):
     id: UUID
+    client_event_id: UUID | None
     rep_number: int
     duration_ms: int
     minimum_angle: float | None

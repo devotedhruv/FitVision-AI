@@ -3,6 +3,7 @@
 from datetime import datetime
 from uuid import UUID
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ResourceNotFoundError
@@ -21,16 +22,25 @@ class WorkoutService:
         self.profiles = ProfileRepository(session)
 
     async def create(self, user: CurrentUserClaims, data: WorkoutCreate):
-        async with self.session.begin():
+        try:
+            async with self.session.begin():
+                existing = await self.workouts.find_idempotent(user.user_id, data.client_session_id)
+                if existing:
+                    return existing
+                exercise = await self.exercises.get_active_by_slug(data.exercise_slug)
+                if exercise is None:
+                    raise ResourceNotFoundError("The requested exercise was not found.")
+                display = user.email.split("@")[0] if user.email else "FitVision User"
+                await self.profiles.ensure(user.user_id, display[:100])
+                return await self.workouts.create(user.user_id, exercise, data)
+        except IntegrityError:
+            # The database uniqueness constraint closes the race between two
+            # concurrent retries using the same mobile-generated UUID.
+            await self.session.rollback()
             existing = await self.workouts.find_idempotent(user.user_id, data.client_session_id)
             if existing:
                 return existing
-            exercise = await self.exercises.get_active_by_slug(data.exercise_slug)
-            if exercise is None:
-                raise ResourceNotFoundError("The requested exercise was not found.")
-            display = user.email.split("@")[0] if user.email else "FitVision User"
-            await self.profiles.ensure(user.user_id, display[:100])
-            return await self.workouts.create(user.user_id, exercise, data)
+            raise
 
     async def list(
         self,

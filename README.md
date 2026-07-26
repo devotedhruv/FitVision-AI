@@ -6,9 +6,9 @@ FitVision AI is an Android-first mobile-system project for future on-device exer
 
 The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
 
-> **Current status:** Phase 5 deterministic exercise analysis is implemented
-> for squats, biceps curls and push-ups on top of the Phase 4 Android
-> CameraX/MediaPipe pipeline. Physical-device threshold calibration remains.
+> **Current status:** Phase 6 offline-first workout sessions are implemented on
+> top of Phase 5, with Drift SQLite persistence, crash-safe timers, local
+> history, a persistent retry queue and idempotent authenticated server sync.
 
 The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
 
@@ -53,7 +53,9 @@ Camera frames are processed on the device. Flutter use cases coordinate the nati
    and lifecycle-safe controls.
 5. **Phase 5 — exercise analysis:** pure-Dart geometry, smoothing, confidence
    filtering, full-cycle rep state machines, form feedback and live results.
-6. **Later phases:** real GPS running, advanced
+6. **Phase 6 — offline workouts and sync:** local session/rep storage,
+   recovery, reactive history and idempotent synchronization.
+7. **Later phases:** real GPS running, advanced
    analytics, validation and delivery.
 
 Roadmap phases after Phase 0 are planning guidance and may change through controlled review.
@@ -170,6 +172,24 @@ flutter test
 ```
 
 See [Phase 5 documentation](docs/phases/phase-05-exercise-engine/README.md).
+
+### Phase 6 database and sync checks
+
+```bash
+cd apps/mobile
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
+```
+
+Apply backend migrations before server sync:
+
+```bash
+cd services/api
+UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run alembic upgrade head
+```
+
+See [Phase 6 documentation](docs/phases/phase-06-workout-storage-sync/README.md).
 
 ## Phase 0 Documentation
 

@@ -82,6 +82,21 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> postJson(
+    String path,
+    Map<String, Object?> body,
+  ) async {
+    try {
+      final response = await _dio.post<Object?>(path, data: body);
+      return Map<String, dynamic>.from(response.data! as Map);
+    } on DioException catch (error) {
+      throw AppException(
+        _mapDioFailure(error),
+        cause: error.response?.statusCode ?? error.type,
+      );
+    }
+  }
+
   Failure _mapDioFailure(DioException error) {
     return switch (error.type) {
       DioExceptionType.connectionTimeout ||
@@ -90,6 +105,12 @@ class ApiClient {
       DioExceptionType.connectionError => const NetworkFailure(),
       DioExceptionType.badResponse when error.response?.statusCode == 401 =>
         const UnauthorizedFailure(),
+      DioExceptionType.badResponse when error.response?.statusCode == 403 =>
+        const ForbiddenFailure(),
+      DioExceptionType.badResponse
+          when error.response?.statusCode == 400 ||
+              error.response?.statusCode == 422 =>
+        const BadRequestFailure(),
       DioExceptionType.badResponse => const ServerFailure(),
       _ => const UnknownFailure(),
     };

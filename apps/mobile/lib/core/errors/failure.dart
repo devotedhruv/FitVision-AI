@@ -36,3 +36,36 @@ final class UnknownFailure extends Failure {
   const UnknownFailure()
     : super('An unexpected error occurred. Please try again.');
 }
+
+final class LocalDatabaseFailure extends Failure {
+  const LocalDatabaseFailure()
+    : super('Could not save the workout. Please try again.');
+}
+
+final class SessionStateFailure extends Failure {
+  const SessionStateFailure([
+    super.message = 'That workout action is not available.',
+  ]);
+}
+
+final class AuthenticationFailure extends Failure {
+  const AuthenticationFailure() : super('Sign in again to sync your workouts.');
+}
+
+final class ValidationFailure extends Failure {
+  const ValidationFailure() : super('The workout data could not be validated.');
+}
+
+final class SyncConflictFailure extends Failure {
+  const SyncConflictFailure()
+    : super('This workout needs review before it can sync.');
+}
+
+final class ForbiddenFailure extends Failure {
+  const ForbiddenFailure() : super('You do not have access to this workout.');
+}
+
+final class BadRequestFailure extends Failure {
+  const BadRequestFailure()
+    : super('The workout data was rejected by the server.');
+}

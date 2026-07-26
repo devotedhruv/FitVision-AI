@@ -13,6 +13,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     UniqueConstraint,
+    Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,6 +27,9 @@ class RepEvent(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "rep_events"
     __table_args__ = (
         UniqueConstraint("workout_session_id", "rep_number", name="uq_rep_workout_number"),
+        UniqueConstraint(
+            "workout_session_id", "client_event_id", name="uq_rep_workout_client_event"
+        ),
         CheckConstraint("rep_number > 0", name="rep_number_positive"),
         CheckConstraint("duration_ms >= 0", name="duration_nonnegative"),
     )
@@ -33,6 +37,7 @@ class RepEvent(UUIDPrimaryKeyMixin, Base):
     workout_session_id: Mapped[UUID] = mapped_column(
         ForeignKey("workout_sessions.id", ondelete="CASCADE"), index=True
     )
+    client_event_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     rep_number: Mapped[int] = mapped_column(Integer)
     duration_ms: Mapped[int] = mapped_column(Integer)
     minimum_angle: Mapped[float | None] = mapped_column(Float)

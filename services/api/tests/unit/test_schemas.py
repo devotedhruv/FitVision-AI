@@ -30,6 +30,7 @@ def test_workout_validates_counts_timestamps_and_duplicate_reps():
         "rule_version": "1.0",
         "rep_events": [
             {
+                "client_event_id": uuid4(),
                 "rep_number": 1,
                 "duration_ms": 1000,
                 "is_valid": True,

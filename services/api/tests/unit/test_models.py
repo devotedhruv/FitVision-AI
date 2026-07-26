@@ -16,6 +16,7 @@ def test_idempotency_and_child_uniqueness_constraints_exist():
     assert "uq_workout_user_client" in constraint_names("workout_sessions")
     assert "uq_run_user_client" in constraint_names("running_sessions")
     assert "uq_rep_workout_number" in constraint_names("rep_events")
+    assert "uq_rep_workout_client_event" in constraint_names("rep_events")
     assert "uq_point_run_sequence" in constraint_names("running_points")
 
 

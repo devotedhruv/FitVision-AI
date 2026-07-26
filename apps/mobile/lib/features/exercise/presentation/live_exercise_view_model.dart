@@ -6,11 +6,18 @@ import 'package:fitvision_ai/features/exercise/application/exercise_feedback_con
 import 'package:fitvision_ai/features/exercise/domain/models/live_pose_session_state.dart';
 import 'package:fitvision_ai/features/exercise/domain/models/exercise_analysis_state.dart';
 import 'package:exercise_engine/exercise_engine.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/exercise/data/workout_providers.dart';
+import 'package:fitvision_ai/features/exercise/domain/models/rep_event.dart'
+    as domain;
+import 'package:fitvision_ai/features/exercise/domain/models/workout_session.dart'
+    as domain;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pose_landmarker/pose_landmarker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
   final CameraPermissionService _permissions = const CameraPermissionService();
@@ -23,6 +30,11 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
   final ExerciseFeedbackController _effects = ExerciseFeedbackController();
   int _lastAnalyzedTimestamp = -1;
   String _exerciseId = '';
+  domain.WorkoutSession? _workout;
+  Future<void> _persistenceChain = Future.value();
+  final Set<String> _recordedRepKeys = {};
+  int _nextSequence = 1;
+  final Uuid _uuid = const Uuid();
 
   @override
   LivePoseSessionState build() {
@@ -44,6 +56,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
   }
 
   ExerciseResult? get result => _result;
+  domain.WorkoutSession? get persistedWorkout => _workout;
 
   Future<void> initializeCamera() async {
     if (state.stage != LivePoseStage.guide &&
@@ -67,6 +80,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       stage: LivePoseStage.initializing,
       feedback: 'Loading the on-device pose model and camera.',
     );
+    await _loadRecoveredWorkout();
     await _poseSubscription?.cancel();
     _poseSubscription = PoseLandmarkerController.instance.results.listen(
       onPoseResult,
@@ -82,6 +96,10 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
 
   @visibleForTesting
   void prepareCameraForTest() {
+    if (_exerciseId.isEmpty) {
+      _exerciseId = 'squat';
+      _analyzer = SquatAnalyzer();
+    }
     state = state.copyWith(
       permission: CameraPermissionState.granted,
       stage: LivePoseStage.initializing,
@@ -160,6 +178,7 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     final output = analyzer.processFrame(
       MediaPipePoseFrameAdapter.convert(result),
     );
+    if (output.completedRep != null) _queueRep(output.completedRep!);
     final shortFeedback = output.feedbackCodes.isEmpty
         ? state.analysis.shortFeedback
         : ExerciseFeedbackText.forCode(output.feedbackCodes.first);
@@ -213,16 +232,11 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       } else {
         timer.cancel();
         state = state.copyWith(
-          stage: LivePoseStage.active,
+          localSaving: true,
           clearCountdown: true,
-          feedback: _analyzer == null
-              ? 'Pose tracking active. This exercise is not analyzed yet.'
-              : 'Tracking active. Begin when ready.',
+          feedback: 'Saving workout on this device.',
         );
-        _analyzer?.reset();
-        _result = null;
-        _lastAnalyzedTimestamp = -1;
-        _startSessionTimer();
+        unawaited(_startPersistedWorkout());
       }
     });
   }
@@ -239,6 +253,20 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
 
   Future<void> pause() async {
     if (state.stage != LivePoseStage.active) return;
+    state = state.copyWith(localSaving: true);
+    final workout = _workout;
+    if (workout == null) return;
+    try {
+      _workout = await ref
+          .read(workoutRepositoryProvider)
+          .pause(workout.localId);
+    } on Object {
+      state = state.copyWith(
+        localSaving: false,
+        feedback: 'Could not pause and save the workout.',
+      );
+      return;
+    }
     _sessionTimer?.cancel();
     _analyzer?.pause();
     await PoseLandmarkerController.instance.pause();
@@ -247,16 +275,33 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
       stage: LivePoseStage.paused,
       resumingSession: false,
       feedback: 'Session paused. Camera resources are suspended.',
+      localSaving: false,
+      elapsed: _workout!.accumulatedActiveDuration,
     );
   }
 
   Future<void> resume() async {
     if (state.stage != LivePoseStage.paused) return;
+    final workout = _workout;
+    if (workout == null) return;
+    state = state.copyWith(localSaving: true);
+    try {
+      _workout = await ref
+          .read(workoutRepositoryProvider)
+          .resume(workout.localId);
+    } on Object {
+      state = state.copyWith(
+        localSaving: false,
+        feedback: 'Could not resume the saved workout.',
+      );
+      return;
+    }
     state = state.copyWith(
       stage: LivePoseStage.initializing,
       resumingSession: true,
       clearPose: true,
       feedback: 'Revalidating camera and pose model.',
+      localSaving: false,
     );
     _analyzer?.resume();
     await PoseLandmarkerController.instance.resume();
@@ -285,6 +330,34 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     _result = _analyzer?.finishSession(
       Duration(milliseconds: state.latestPose?.timestampMs ?? 0),
     );
+    for (final rep in _result?.repResults ?? const <RepResult>[]) {
+      _queueRep(rep);
+    }
+    try {
+      await _persistenceChain;
+    } on Object {
+      _ending = false;
+      state = state.copyWith(
+        localSaving: false,
+        feedback: 'Could not save the workout. Please try again.',
+      );
+      return null;
+    }
+    final workout = _workout;
+    if (workout != null) {
+      try {
+        _workout = await ref
+            .read(workoutRepositoryProvider)
+            .end(workout.localId);
+      } on Object {
+        _ending = false;
+        state = state.copyWith(
+          localSaving: false,
+          feedback: 'Could not save the workout. Please try again.',
+        );
+        return null;
+      }
+    }
     await PoseLandmarkerController.instance.dispose();
     if (ref.mounted) {
       state = state.copyWith(
@@ -293,9 +366,13 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
         clearCountdown: true,
         clearPose: true,
         feedback: 'Camera session ended.',
+        localSaving: false,
       );
     }
     _ending = false;
+    if (_workout != null) {
+      unawaited(ref.read(syncManagerProvider).synchronize());
+    }
     return _result;
   }
 
@@ -362,10 +439,121 @@ class LiveExerciseViewModel extends Notifier<LivePoseSessionState> {
     _sessionTimer?.cancel();
     _sessionTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (ref.mounted && state.stage == LivePoseStage.active) {
+        final workout = _workout;
         state = state.copyWith(
-          elapsed: state.elapsed + const Duration(seconds: 1),
+          elapsed:
+              workout?.activeDurationAt(DateTime.now().toUtc()) ??
+              state.elapsed,
         );
       }
+    });
+  }
+
+  Future<void> _startPersistedWorkout() async {
+    final user = ref.read(authRepositoryProvider).currentUser;
+    final type = switch (_exerciseId) {
+      'squat' => domain.WorkoutExerciseType.squat,
+      'bicep-curl' => domain.WorkoutExerciseType.curl,
+      'push-up' => domain.WorkoutExerciseType.pushup,
+      _ => null,
+    };
+    if (user == null || type == null) {
+      state = state.copyWith(
+        stage: LivePoseStage.error,
+        localSaving: false,
+        feedback: user == null
+            ? 'Sign in before starting a workout.'
+            : 'This exercise is not available for rep tracking.',
+      );
+      return;
+    }
+    try {
+      if (_workout?.status == domain.WorkoutSessionStatus.paused &&
+          _workout?.exerciseType == type) {
+        _workout = await ref
+            .read(workoutRepositoryProvider)
+            .resume(_workout!.localId);
+        _nextSequence = _workout!.repEvents.length + 1;
+      } else {
+        _workout = await ref
+            .read(workoutRepositoryProvider)
+            .start(userId: user.id, exerciseType: type);
+        _nextSequence = 1;
+      }
+      _analyzer?.reset();
+      _result = null;
+      _lastAnalyzedTimestamp = -1;
+      _recordedRepKeys.clear();
+      state = state.copyWith(
+        stage: LivePoseStage.active,
+        localSaving: false,
+        workoutLocalId: _workout!.localId,
+        elapsed: Duration.zero,
+        feedback: 'Workout saved on this device. Begin when ready.',
+      );
+      _startSessionTimer();
+    } on Object {
+      state = state.copyWith(
+        stage: LivePoseStage.positioning,
+        localSaving: false,
+        feedback: 'Could not save the workout. Please try again.',
+      );
+    }
+  }
+
+  Future<void> _loadRecoveredWorkout() async {
+    final user = ref.read(authRepositoryProvider).currentUser;
+    if (user == null || _workout != null) return;
+    final recovered = await ref
+        .read(workoutRepositoryProvider)
+        .recover(user.id);
+    final expected = switch (_exerciseId) {
+      'squat' => domain.WorkoutExerciseType.squat,
+      'bicep-curl' => domain.WorkoutExerciseType.curl,
+      'push-up' => domain.WorkoutExerciseType.pushup,
+      _ => null,
+    };
+    if (recovered != null &&
+        recovered.exerciseType == expected &&
+        ref.mounted) {
+      _workout = recovered;
+      _nextSequence = recovered.repEvents.length + 1;
+      state = state.copyWith(
+        elapsed: recovered.accumulatedActiveDuration,
+        workoutLocalId: recovered.localId,
+        feedback: 'A paused workout is saved. Set up the camera to resume it.',
+      );
+    }
+  }
+
+  void _queueRep(RepResult rep) {
+    final workout = _workout;
+    if (workout == null) return;
+    final key =
+        '${rep.startTime.inMilliseconds}:${rep.endTime.inMilliseconds}:${rep.completed}';
+    if (!_recordedRepKeys.add(key)) return;
+    final endedAt = DateTime.now().toUtc();
+    final event = domain.RepEvent(
+      localId: _uuid.v4(),
+      workoutLocalId: workout.localId,
+      sequenceNumber: _nextSequence++,
+      eventType: rep.completed
+          ? domain.RepEventType.completed
+          : domain.RepEventType.incomplete,
+      exerciseType: workout.exerciseType,
+      startedAt: endedAt.subtract(rep.duration),
+      endedAt: endedAt,
+      duration: rep.duration,
+      formValid: rep.formValid,
+      minimumPrimaryAngle: rep.minimumAngle,
+      maximumPrimaryAngle: rep.maximumAngle,
+      feedbackCodes: rep.feedbackCodes
+          .map((code) => code.name)
+          .toList(growable: false),
+      createdAt: endedAt,
+    );
+    _persistenceChain = _persistenceChain.then((_) async {
+      _workout = await ref.read(workoutRepositoryProvider).recordRep(event);
     });
   }
 

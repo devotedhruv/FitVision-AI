@@ -143,6 +143,8 @@ class LiveExerciseView extends ConsumerWidget {
   ) async {
     final analysisResult = await controller.end();
     if (!context.mounted) return;
+    final persisted = controller.persistedWorkout;
+    if (persisted == null || persisted.status.name != 'completed') return;
     context.go(
       '/exercises/${exercise.id}/result',
       extra: WorkoutResultData(
@@ -162,6 +164,8 @@ class LiveExerciseView extends ConsumerWidget {
                 .take(3)
                 .toList(growable: false) ??
             const [],
+        workoutLocalId: persisted.localId,
+        syncState: persisted.syncState.name,
       ),
     );
   }
@@ -345,7 +349,7 @@ class _ControlPanel extends StatelessWidget {
                 IconButton.filled(
                   key: const Key('end-session'),
                   tooltip: 'End session',
-                  onPressed: onEnd,
+                  onPressed: state.localSaving ? null : onEnd,
                   icon: const Icon(Icons.stop),
                 ),
               ],
