@@ -27,6 +27,7 @@ abstract final class WorkoutSessionMapper {
             ? null
             : Duration(milliseconds: row.averageRepDurationMs!),
         summaryJson: row.summaryJson,
+        formScore: row.formScore,
         repEvents: List.unmodifiable(events),
         syncState: WorkoutSyncState.values.byName(row.syncStatus),
         createdAt: row.createdAt.toUtc(),
@@ -56,6 +57,7 @@ abstract final class WorkoutSessionMapper {
         totalRepCount: Value(session.totalRepCount),
         averageRepDurationMs: Value(session.averageRepDuration?.inMilliseconds),
         summaryJson: Value(session.summaryJson),
+        formScore: Value(session.formScore),
         createdAt: session.createdAt.toUtc(),
         updatedAt: session.updatedAt.toUtc(),
         syncStatus: session.syncState.name,

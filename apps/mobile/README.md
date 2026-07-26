@@ -1,5 +1,13 @@
 # FitVision AI Mobile
 
+## Phase 7 running
+
+Running requires precise foreground location and Android notification permission. Tracking is started only from Running Setup. Generate Drift schema v2 with `dart run build_runner build`, then run `flutter analyze` and `flutter test`. Pending runs are visible in `sync_queue_items` with entity type `running_session`.
+
+## Phase 8 history and analytics
+
+History and analytics read completed user-scoped rows from Drift, work offline, and include unsynced sessions. Analytics uses deterministic calculators and fixed insight codes; no LLM configuration is required. See `docs/phases/phase-08-history-analytics/analytics-specification.md` for formulas.
+
 Android-first Flutter client for FitVision AI. Phase 2 provides the visual
 experience. Phase 3 adds Supabase registration, login, email-verification state,
 logout, authenticated API requests, profile integration, and the backend

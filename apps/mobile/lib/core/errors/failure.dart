@@ -69,3 +69,48 @@ final class BadRequestFailure extends Failure {
   const BadRequestFailure()
     : super('The workout data was rejected by the server.');
 }
+
+final class LocationPermissionFailure extends Failure {
+  const LocationPermissionFailure([
+    super.message = 'Location permission is required.',
+  ]);
+}
+
+final class LocationServiceDisabledFailure extends Failure {
+  const LocationServiceDisabledFailure()
+    : super('Turn on location services to begin.');
+}
+
+final class PreciseLocationRequiredFailure extends Failure {
+  const PreciseLocationRequiredFailure()
+    : super('Precise location is needed to track your route.');
+}
+
+final class ForegroundServiceFailure extends Failure {
+  const ForegroundServiceFailure([
+    super.message = 'Could not start background run tracking.',
+  ]);
+}
+
+final class GpsUnavailableFailure extends Failure {
+  const GpsUnavailableFailure() : super('Waiting for a GPS signal.');
+}
+
+final class PoorGpsAccuracyFailure extends Failure {
+  const PoorGpsAccuracyFailure() : super('Waiting for a better GPS signal.');
+}
+
+final class InvalidRunningStateFailure extends Failure {
+  const InvalidRunningStateFailure([
+    super.message = 'That run action is not available.',
+  ]);
+}
+
+final class MapFailure extends Failure {
+  const MapFailure()
+    : super('The route map is unavailable. Tracking continues.');
+}
+
+final class SyncFailure extends Failure {
+  const SyncFailure([super.message = 'Sync will retry when you are online.']);
+}

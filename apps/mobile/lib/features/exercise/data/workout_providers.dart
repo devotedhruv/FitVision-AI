@@ -11,6 +11,7 @@ import '../domain/models/workout_session.dart';
 import 'workout_local_data_source.dart';
 import 'workout_remote_data_source.dart';
 import 'workout_repository_impl.dart';
+import 'package:fitvision_ai/features/running/data/running_providers.dart';
 
 final workoutLocalDataSourceProvider = Provider<WorkoutLocalDataSource>(
   (ref) => WorkoutLocalDataSource(ref.watch(localDatabaseProvider)),
@@ -32,6 +33,7 @@ final syncManagerProvider = Provider<SyncManager>((ref) {
     remote: ref.watch(workoutRemoteDataSourceProvider),
     auth: ref.watch(authRepositoryProvider),
     connectivity: ref.watch(connectivityMonitorProvider),
+    runningRemote: ref.watch(runningRemoteDataSourceProvider),
   );
   ref.onDispose(manager.dispose);
   return manager;

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, Integer, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, UUIDPrimaryKeyMixin
@@ -17,6 +17,7 @@ class RunningPoint(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "running_points"
     __table_args__ = (
         UniqueConstraint("running_session_id", "sequence_number", name="uq_point_run_sequence"),
+        UniqueConstraint("running_session_id", "client_point_id", name="uq_point_run_client"),
         CheckConstraint("sequence_number >= 0", name="sequence_nonnegative"),
         CheckConstraint("latitude >= -90 AND latitude <= 90", name="latitude_range"),
         CheckConstraint("longitude >= -180 AND longitude <= 180", name="longitude_range"),
@@ -29,6 +30,7 @@ class RunningPoint(UUIDPrimaryKeyMixin, Base):
         ForeignKey("running_sessions.id", ondelete="CASCADE"), index=True
     )
     sequence_number: Mapped[int] = mapped_column(Integer)
+    client_point_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     latitude: Mapped[float] = mapped_column(Float)
     longitude: Mapped[float] = mapped_column(Float)
     accuracy_meters: Mapped[float | None] = mapped_column(Float)

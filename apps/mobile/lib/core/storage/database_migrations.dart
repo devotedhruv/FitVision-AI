@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 abstract final class DatabaseMigrations {
-  static const schemaVersion = 1;
+  static const schemaVersion = 2;
 
   static MigrationStrategy strategy(
     GeneratedDatabase database,
@@ -20,11 +20,23 @@ abstract final class DatabaseMigrations {
       await database.customStatement(
         'CREATE INDEX idx_sync_eligible ON sync_queue_items (status, next_attempt_at, created_at)',
       );
+      await _runningIndexes(database);
     },
     onUpgrade: (migrator, from, to) async {
-      // Version 1 is the first structured local database. Future upgrades must
-      // add explicit, non-destructive steps here.
       if (from > to) throw StateError('Database downgrades are not supported.');
+      if (from < 2) {
+        await migrator.createTable(
+          database.allTables.firstWhere(
+            (table) => table.actualTableName == 'running_sessions',
+          ),
+        );
+        await migrator.createTable(
+          database.allTables.firstWhere(
+            (table) => table.actualTableName == 'running_points',
+          ),
+        );
+        await _runningIndexes(database);
+      }
     },
     beforeOpen: (details) async {
       await database.customStatement('PRAGMA foreign_keys = ON');
@@ -33,4 +45,16 @@ abstract final class DatabaseMigrations {
       }
     },
   );
+
+  static Future<void> _runningIndexes(GeneratedDatabase database) async {
+    await database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_run_local_user_started ON running_sessions (user_id, started_at DESC)',
+    );
+    await database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_run_local_status ON running_sessions (status)',
+    );
+    await database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_run_local_sync ON running_sessions (sync_status)',
+    );
+  }
 }

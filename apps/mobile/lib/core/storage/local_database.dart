@@ -10,10 +10,20 @@ import 'database_migrations.dart';
 import 'tables/rep_events_table.dart';
 import 'tables/sync_queue_table.dart';
 import 'tables/workout_sessions_table.dart';
+import 'tables/running_sessions_table.dart';
+import 'tables/running_points_table.dart';
 
 part 'local_database.g.dart';
 
-@DriftDatabase(tables: [WorkoutSessions, RepEvents, SyncQueueItems])
+@DriftDatabase(
+  tables: [
+    WorkoutSessions,
+    RepEvents,
+    SyncQueueItems,
+    RunningSessions,
+    RunningPoints,
+  ],
+)
 class LocalDatabase extends _$LocalDatabase {
   LocalDatabase() : super(_openConnection());
   LocalDatabase.forTesting(super.executor);

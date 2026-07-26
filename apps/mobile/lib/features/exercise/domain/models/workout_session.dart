@@ -26,6 +26,7 @@ class WorkoutSession {
     required this.updatedAt,
     this.averageRepDuration,
     this.summaryJson,
+    this.formScore,
     this.lastSyncedAt,
     this.recordVersion = 1,
   });
@@ -44,6 +45,7 @@ class WorkoutSession {
   final int validFormRepCount;
   final Duration? averageRepDuration;
   final String? summaryJson;
+  final double? formScore;
   final List<RepEvent> repEvents;
   final WorkoutSyncState syncState;
   final DateTime createdAt;

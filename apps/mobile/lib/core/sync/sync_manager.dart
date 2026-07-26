@@ -8,6 +8,7 @@ import 'package:fitvision_ai/features/authentication/domain/auth_repository.dart
 import 'package:fitvision_ai/features/authentication/domain/auth_user.dart';
 import 'package:fitvision_ai/features/exercise/data/workout_local_data_source.dart';
 import 'package:fitvision_ai/features/exercise/data/workout_remote_data_source.dart';
+import 'package:fitvision_ai/features/running/data/running_remote_data_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'connectivity_monitor.dart';
@@ -23,6 +24,7 @@ class SyncManager extends ChangeNotifier {
     required this.connectivity,
     RetryPolicy? retryPolicy,
     DateTime Function()? clock,
+    this.runningRemote,
   }) : retryPolicy = retryPolicy ?? RetryPolicy(),
        clock = clock ?? DateTime.now;
   final SyncQueueDao queue;
@@ -31,6 +33,7 @@ class SyncManager extends ChangeNotifier {
   final AuthRepository auth;
   final ConnectivityMonitor connectivity;
   final RetryPolicy retryPolicy;
+  final RunningRemoteDataSource? runningRemote;
   final DateTime Function() clock;
   StreamSubscription<void>? _connectivitySubscription;
   StreamSubscription<AuthUser?>? _authSubscription;
@@ -88,13 +91,22 @@ class SyncManager extends ChangeNotifier {
         updatedAt: Value(now),
       ),
     );
-    await local.markWorkoutSyncing(job.entityLocalId);
+    if (job.entityType == 'running_session') {
+      await _markRun(job.entityLocalId, 'syncing');
+    } else {
+      await local.markWorkoutSyncing(job.entityLocalId);
+    }
     try {
       final payload = Map<String, Object?>.from(
         jsonDecode(job.payloadJson) as Map,
       );
-      final result = await remote.createOrGet(payload);
-      await local.markWorkoutSynced(job.entityLocalId, result.remoteId);
+      if (job.entityType == 'running_session') {
+        final result = await runningRemote!.createOrGet(payload);
+        await _markRun(job.entityLocalId, 'synced', result.remoteId);
+      } else {
+        final result = await remote.createOrGet(payload);
+        await local.markWorkoutSynced(job.entityLocalId, result.remoteId);
+      }
       await queue.remove(job.id);
     } on AppException catch (error) {
       await _fail(job, error.failure, error.cause);
@@ -111,10 +123,14 @@ class SyncManager extends ChangeNotifier {
     final attempt = job.attemptCount + 1;
     final canRetry = retryable && retryPolicy.canRetry(attempt);
     final now = clock().toUtc();
-    await local.markWorkoutSyncFailed(
-      job.entityLocalId,
-      conflict: !retryable && failure is! UnauthorizedFailure,
-    );
+    if (job.entityType == 'running_session') {
+      await _markRun(job.entityLocalId, retryable ? 'failed' : 'conflict');
+    } else {
+      await local.markWorkoutSyncFailed(
+        job.entityLocalId,
+        conflict: !retryable && failure is! UnauthorizedFailure,
+      );
+    }
     await queue.updateItem(
       job.id,
       SyncQueueItemsCompanion(
@@ -133,6 +149,21 @@ class SyncManager extends ChangeNotifier {
       failure is UnauthorizedFailure
           ? SyncManagerState.authenticationRequired
           : SyncManagerState.failed,
+    );
+  }
+
+  Future<void> _markRun(String id, String status, [String? remoteId]) async {
+    await (queue.database.update(
+      queue.database.runningSessions,
+    )..where((row) => row.localId.equals(id))).write(
+      RunningSessionsCompanion(
+        syncStatus: Value(status),
+        remoteId: remoteId == null ? const Value.absent() : Value(remoteId),
+        lastSyncedAt: status == 'synced'
+            ? Value(clock().toUtc())
+            : const Value.absent(),
+        updatedAt: Value(clock().toUtc()),
+      ),
     );
   }
 

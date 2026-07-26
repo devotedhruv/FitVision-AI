@@ -9,6 +9,7 @@ from app.schemas.common import ORMResponse, StrictSchema, require_timezone
 
 
 class RunningPointCreate(StrictSchema):
+    client_point_id: UUID | None = None
     sequence_number: int = Field(ge=0)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -42,6 +43,7 @@ class RunCreate(StrictSchema):
 
 class RunningPointResponse(ORMResponse):
     id: UUID
+    client_point_id: UUID | None
     sequence_number: int
     latitude: float
     longitude: float

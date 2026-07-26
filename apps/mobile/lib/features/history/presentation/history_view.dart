@@ -1,10 +1,20 @@
-import 'package:fitvision_ai/core/design_system/app_spacing.dart';
-import 'package:fitvision_ai/core/utils/date_time_formatter.dart';
-import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
-import 'package:fitvision_ai/features/exercise/data/workout_providers.dart';
-import 'package:fitvision_ai/features/exercise/domain/models/workout_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import '../data/history_providers.dart';
+import 'history_view_model.dart';
+import 'widgets/history_empty_state.dart';
+import 'widgets/history_filter_sheet.dart';
+import 'widgets/history_item_card.dart';
+
+final historyViewModelProvider = ChangeNotifierProvider.autoDispose
+    .family<HistoryViewModel, String>((ref, user) {
+      final vm = HistoryViewModel(ref.watch(historyRepositoryProvider), user);
+      Future.microtask(vm.load);
+      return vm;
+    });
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
@@ -13,57 +23,63 @@ class HistoryView extends ConsumerWidget {
     final user = ref.watch(authRepositoryProvider).currentUser;
     if (user == null) {
       return const Scaffold(
-        body: Center(child: Text('Sign in to view workout history.')),
+        body: Center(child: Text('Sign in to view history.')),
       );
     }
-    final history = ref.watch(workoutHistoryProvider(user.id));
+    final vm = ref.watch(historyViewModelProvider(user.id));
     return Scaffold(
-      appBar: AppBar(title: const Text('History')),
-      body: history.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => const Center(
-          child: Text('Local workout history could not be loaded.'),
-        ),
-        data: (items) => items.isEmpty
-            ? const Center(child: Text('No saved workouts yet.'))
-            : ListView(
-                padding: const EdgeInsets.all(AppSpacing.md),
+      appBar: AppBar(
+        title: const Text('History'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () async {
+              final filter = await showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => HistoryFilterSheet(initial: vm.filter),
+              );
+              if (filter != null) await vm.apply(filter);
+            },
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => vm.load(),
+        child: vm.error != null && vm.items.isEmpty
+            ? ListView(
                 children: [
-                  for (final item in items)
-                    Card(
-                      child: ListTile(
-                        leading: Icon(
-                          item.status == WorkoutSessionStatus.completed
-                              ? Icons.check_circle_outline
-                              : Icons.pause_circle_outline,
-                        ),
-                        title: Text(_exerciseName(item.exerciseType)),
-                        subtitle: Text(
-                          '${DateTimeFormatter.shortDate(item.startedAt.toLocal())} • ${item.accumulatedActiveDuration.inMinutes} min • ${item.completedRepCount} reps',
-                        ),
-                        trailing: _syncIcon(item.syncState),
-                      ),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Text(vm.error!, textAlign: TextAlign.center),
+                  ),
                 ],
+              )
+            : vm.items.isEmpty && !vm.loading
+            ? ListView(
+                children: const [SizedBox(height: 200), HistoryEmptyState()],
+              )
+            : ListView.builder(
+                itemCount: vm.items.length + (vm.hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == vm.items.length) {
+                    return TextButton(
+                      onPressed: vm.loading
+                          ? null
+                          : () => vm.load(reset: false),
+                      child: Text(vm.loading ? 'Loading…' : 'Load more'),
+                    );
+                  }
+                  final item = vm.items[index];
+                  return HistoryItemCard(
+                    item: item,
+                    onTap: () => context.push(
+                      '/history/${item.category.name}:${item.localId}',
+                    ),
+                  );
+                },
               ),
       ),
     );
   }
-
-  String _exerciseName(WorkoutExerciseType type) => switch (type) {
-    WorkoutExerciseType.squat => 'Squat',
-    WorkoutExerciseType.curl => 'Bicep curl',
-    WorkoutExerciseType.pushup => 'Push-up',
-  };
-  Widget _syncIcon(WorkoutSyncState state) => Tooltip(
-    message: state == WorkoutSyncState.synced ? 'Synced' : 'Saved on device',
-    child: Icon(
-      state == WorkoutSyncState.synced
-          ? Icons.cloud_done_outlined
-          : state == WorkoutSyncState.failed ||
-                state == WorkoutSyncState.conflict
-          ? Icons.cloud_off_outlined
-          : Icons.cloud_upload_outlined,
-    ),
-  );
 }

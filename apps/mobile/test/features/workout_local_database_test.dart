@@ -26,7 +26,7 @@ void main() {
       expect(restored!.localId, 'workout-1');
       expect(restored.status, WorkoutSessionStatus.active);
       expect(await local.queue.pendingCount(), 1);
-      expect(database.schemaVersion, 1);
+      expect(database.schemaVersion, 2);
     },
   );
 

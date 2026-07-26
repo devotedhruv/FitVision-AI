@@ -12,7 +12,10 @@ import 'package:fitvision_ai/features/authentication/presentation/login_view.dar
 import 'package:fitvision_ai/features/authentication/presentation/register_view.dart';
 import 'package:fitvision_ai/features/onboarding/presentation/onboarding_view.dart';
 import 'package:fitvision_ai/features/profile/presentation/profile_view.dart';
-import 'package:fitvision_ai/features/phase_boundaries/presentation/phase_boundary_views.dart';
+import 'package:fitvision_ai/features/history/presentation/session_detail_view.dart';
+import 'package:fitvision_ai/features/running/presentation/running_setup_view.dart';
+import 'package:fitvision_ai/features/running/presentation/live_running_view.dart';
+import 'package:fitvision_ai/features/running/presentation/running_result_view.dart';
 import 'package:fitvision_ai/features/settings/presentation/settings_view.dart';
 import 'package:fitvision_ai/features/splash/presentation/splash_view.dart';
 import 'package:fitvision_ai/features/exercise/domain/models/live_pose_session_state.dart';
@@ -165,7 +168,7 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: ':sessionId',
                   builder: (context, state) => SessionDetailView(
-                    sessionId: state.pathParameters['sessionId'] ?? '',
+                    sessionKey: state.pathParameters['sessionId'] ?? '',
                   ),
                 ),
               ],
@@ -205,7 +208,9 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/running/result',
-      builder: (context, state) => const RunningResultView(),
+      builder: (context, state) => RunningResultView(
+        localId: state.extra is String ? state.extra! as String : '',
+      ),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

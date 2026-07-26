@@ -6,9 +6,11 @@ FitVision AI is an Android-first mobile-system project for future on-device exer
 
 The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
 
-> **Current status:** Phase 6 offline-first workout sessions are implemented on
+> **Current status:** Phase 8 unified history and deterministic analytics are implemented on
 > top of Phase 5, with Drift SQLite persistence, crash-safe timers, local
 > history, a persistent retry queue and idempotent authenticated server sync.
+> Outdoor runs use precise user-consented GPS, an Android location foreground service, Drift checkpoints, deterministic filtering and local-first results.
+> Completed workouts and runs now feed offline filters, calendar summaries, weighted pace, valid-form trends and explainable rule-coded insights without generative AI.
 
 The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
 

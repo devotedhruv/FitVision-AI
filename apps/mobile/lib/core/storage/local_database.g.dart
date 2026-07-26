@@ -3052,6 +3052,2367 @@ class SyncQueueItemsCompanion extends UpdateCompanion<SyncQueueItem> {
   }
 }
 
+class $RunningSessionsTable extends RunningSessions
+    with TableInfo<$RunningSessionsTable, RunningSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RunningSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _localIdMeta = const VerificationMeta(
+    'localId',
+  );
+  @override
+  late final GeneratedColumn<String> localId = GeneratedColumn<String>(
+    'local_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endedAt = GeneratedColumn<DateTime>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accumulatedActiveDurationMsMeta =
+      const VerificationMeta('accumulatedActiveDurationMs');
+  @override
+  late final GeneratedColumn<int> accumulatedActiveDurationMs =
+      GeneratedColumn<int>(
+        'accumulated_active_duration_ms',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      );
+  static const VerificationMeta _accumulatedPausedDurationMsMeta =
+      const VerificationMeta('accumulatedPausedDurationMs');
+  @override
+  late final GeneratedColumn<int> accumulatedPausedDurationMs =
+      GeneratedColumn<int>(
+        'accumulated_paused_duration_ms',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      );
+  static const VerificationMeta _currentActiveSegmentStartedAtMeta =
+      const VerificationMeta('currentActiveSegmentStartedAt');
+  @override
+  late final GeneratedColumn<DateTime> currentActiveSegmentStartedAt =
+      GeneratedColumn<DateTime>(
+        'current_active_segment_started_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _currentPauseStartedAtMeta =
+      const VerificationMeta('currentPauseStartedAt');
+  @override
+  late final GeneratedColumn<DateTime> currentPauseStartedAt =
+      GeneratedColumn<DateTime>(
+        'current_pause_started_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _totalDistanceMetersMeta =
+      const VerificationMeta('totalDistanceMeters');
+  @override
+  late final GeneratedColumn<double> totalDistanceMeters =
+      GeneratedColumn<double>(
+        'total_distance_meters',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      );
+  static const VerificationMeta _averageSpeedMpsMeta = const VerificationMeta(
+    'averageSpeedMps',
+  );
+  @override
+  late final GeneratedColumn<double> averageSpeedMps = GeneratedColumn<double>(
+    'average_speed_mps',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _averagePaceSecondsPerKmMeta =
+      const VerificationMeta('averagePaceSecondsPerKm');
+  @override
+  late final GeneratedColumn<double> averagePaceSecondsPerKm =
+      GeneratedColumn<double>(
+        'average_pace_seconds_per_km',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _elevationGainMetersMeta =
+      const VerificationMeta('elevationGainMeters');
+  @override
+  late final GeneratedColumn<double> elevationGainMeters =
+      GeneratedColumn<double>(
+        'elevation_gain_meters',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _acceptedPointCountMeta =
+      const VerificationMeta('acceptedPointCount');
+  @override
+  late final GeneratedColumn<int> acceptedPointCount = GeneratedColumn<int>(
+    'accepted_point_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _rejectedPointCountMeta =
+      const VerificationMeta('rejectedPointCount');
+  @override
+  late final GeneratedColumn<int> rejectedPointCount = GeneratedColumn<int>(
+    'rejected_point_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _recordVersionMeta = const VerificationMeta(
+    'recordVersion',
+  );
+  @override
+  late final GeneratedColumn<int> recordVersion = GeneratedColumn<int>(
+    'record_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    localId,
+    remoteId,
+    userId,
+    status,
+    startedAt,
+    endedAt,
+    accumulatedActiveDurationMs,
+    accumulatedPausedDurationMs,
+    currentActiveSegmentStartedAt,
+    currentPauseStartedAt,
+    totalDistanceMeters,
+    averageSpeedMps,
+    averagePaceSecondsPerKm,
+    elevationGainMeters,
+    acceptedPointCount,
+    rejectedPointCount,
+    createdAt,
+    updatedAt,
+    syncStatus,
+    lastSyncedAt,
+    recordVersion,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'running_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RunningSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('local_id')) {
+      context.handle(
+        _localIdMeta,
+        localId.isAcceptableOrUnknown(data['local_id']!, _localIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localIdMeta);
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('accumulated_active_duration_ms')) {
+      context.handle(
+        _accumulatedActiveDurationMsMeta,
+        accumulatedActiveDurationMs.isAcceptableOrUnknown(
+          data['accumulated_active_duration_ms']!,
+          _accumulatedActiveDurationMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('accumulated_paused_duration_ms')) {
+      context.handle(
+        _accumulatedPausedDurationMsMeta,
+        accumulatedPausedDurationMs.isAcceptableOrUnknown(
+          data['accumulated_paused_duration_ms']!,
+          _accumulatedPausedDurationMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('current_active_segment_started_at')) {
+      context.handle(
+        _currentActiveSegmentStartedAtMeta,
+        currentActiveSegmentStartedAt.isAcceptableOrUnknown(
+          data['current_active_segment_started_at']!,
+          _currentActiveSegmentStartedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('current_pause_started_at')) {
+      context.handle(
+        _currentPauseStartedAtMeta,
+        currentPauseStartedAt.isAcceptableOrUnknown(
+          data['current_pause_started_at']!,
+          _currentPauseStartedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('total_distance_meters')) {
+      context.handle(
+        _totalDistanceMetersMeta,
+        totalDistanceMeters.isAcceptableOrUnknown(
+          data['total_distance_meters']!,
+          _totalDistanceMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('average_speed_mps')) {
+      context.handle(
+        _averageSpeedMpsMeta,
+        averageSpeedMps.isAcceptableOrUnknown(
+          data['average_speed_mps']!,
+          _averageSpeedMpsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('average_pace_seconds_per_km')) {
+      context.handle(
+        _averagePaceSecondsPerKmMeta,
+        averagePaceSecondsPerKm.isAcceptableOrUnknown(
+          data['average_pace_seconds_per_km']!,
+          _averagePaceSecondsPerKmMeta,
+        ),
+      );
+    }
+    if (data.containsKey('elevation_gain_meters')) {
+      context.handle(
+        _elevationGainMetersMeta,
+        elevationGainMeters.isAcceptableOrUnknown(
+          data['elevation_gain_meters']!,
+          _elevationGainMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('accepted_point_count')) {
+      context.handle(
+        _acceptedPointCountMeta,
+        acceptedPointCount.isAcceptableOrUnknown(
+          data['accepted_point_count']!,
+          _acceptedPointCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('rejected_point_count')) {
+      context.handle(
+        _rejectedPointCountMeta,
+        rejectedPointCount.isAcceptableOrUnknown(
+          data['rejected_point_count']!,
+          _rejectedPointCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('record_version')) {
+      context.handle(
+        _recordVersionMeta,
+        recordVersion.isAcceptableOrUnknown(
+          data['record_version']!,
+          _recordVersionMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {localId};
+  @override
+  RunningSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RunningSession(
+      localId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_id'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}ended_at'],
+      ),
+      accumulatedActiveDurationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}accumulated_active_duration_ms'],
+      )!,
+      accumulatedPausedDurationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}accumulated_paused_duration_ms'],
+      )!,
+      currentActiveSegmentStartedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}current_active_segment_started_at'],
+      ),
+      currentPauseStartedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}current_pause_started_at'],
+      ),
+      totalDistanceMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total_distance_meters'],
+      )!,
+      averageSpeedMps: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}average_speed_mps'],
+      ),
+      averagePaceSecondsPerKm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}average_pace_seconds_per_km'],
+      ),
+      elevationGainMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}elevation_gain_meters'],
+      ),
+      acceptedPointCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}accepted_point_count'],
+      )!,
+      rejectedPointCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rejected_point_count'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      recordVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}record_version'],
+      )!,
+    );
+  }
+
+  @override
+  $RunningSessionsTable createAlias(String alias) {
+    return $RunningSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class RunningSession extends DataClass implements Insertable<RunningSession> {
+  final String localId;
+  final String? remoteId;
+  final String userId;
+  final String status;
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final int accumulatedActiveDurationMs;
+  final int accumulatedPausedDurationMs;
+  final DateTime? currentActiveSegmentStartedAt;
+  final DateTime? currentPauseStartedAt;
+  final double totalDistanceMeters;
+  final double? averageSpeedMps;
+  final double? averagePaceSecondsPerKm;
+  final double? elevationGainMeters;
+  final int acceptedPointCount;
+  final int rejectedPointCount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String syncStatus;
+  final DateTime? lastSyncedAt;
+  final int recordVersion;
+  const RunningSession({
+    required this.localId,
+    this.remoteId,
+    required this.userId,
+    required this.status,
+    required this.startedAt,
+    this.endedAt,
+    required this.accumulatedActiveDurationMs,
+    required this.accumulatedPausedDurationMs,
+    this.currentActiveSegmentStartedAt,
+    this.currentPauseStartedAt,
+    required this.totalDistanceMeters,
+    this.averageSpeedMps,
+    this.averagePaceSecondsPerKm,
+    this.elevationGainMeters,
+    required this.acceptedPointCount,
+    required this.rejectedPointCount,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    required this.recordVersion,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['local_id'] = Variable<String>(localId);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['user_id'] = Variable<String>(userId);
+    map['status'] = Variable<String>(status);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<DateTime>(endedAt);
+    }
+    map['accumulated_active_duration_ms'] = Variable<int>(
+      accumulatedActiveDurationMs,
+    );
+    map['accumulated_paused_duration_ms'] = Variable<int>(
+      accumulatedPausedDurationMs,
+    );
+    if (!nullToAbsent || currentActiveSegmentStartedAt != null) {
+      map['current_active_segment_started_at'] = Variable<DateTime>(
+        currentActiveSegmentStartedAt,
+      );
+    }
+    if (!nullToAbsent || currentPauseStartedAt != null) {
+      map['current_pause_started_at'] = Variable<DateTime>(
+        currentPauseStartedAt,
+      );
+    }
+    map['total_distance_meters'] = Variable<double>(totalDistanceMeters);
+    if (!nullToAbsent || averageSpeedMps != null) {
+      map['average_speed_mps'] = Variable<double>(averageSpeedMps);
+    }
+    if (!nullToAbsent || averagePaceSecondsPerKm != null) {
+      map['average_pace_seconds_per_km'] = Variable<double>(
+        averagePaceSecondsPerKm,
+      );
+    }
+    if (!nullToAbsent || elevationGainMeters != null) {
+      map['elevation_gain_meters'] = Variable<double>(elevationGainMeters);
+    }
+    map['accepted_point_count'] = Variable<int>(acceptedPointCount);
+    map['rejected_point_count'] = Variable<int>(rejectedPointCount);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    map['record_version'] = Variable<int>(recordVersion);
+    return map;
+  }
+
+  RunningSessionsCompanion toCompanion(bool nullToAbsent) {
+    return RunningSessionsCompanion(
+      localId: Value(localId),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      userId: Value(userId),
+      status: Value(status),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      accumulatedActiveDurationMs: Value(accumulatedActiveDurationMs),
+      accumulatedPausedDurationMs: Value(accumulatedPausedDurationMs),
+      currentActiveSegmentStartedAt:
+          currentActiveSegmentStartedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentActiveSegmentStartedAt),
+      currentPauseStartedAt: currentPauseStartedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentPauseStartedAt),
+      totalDistanceMeters: Value(totalDistanceMeters),
+      averageSpeedMps: averageSpeedMps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(averageSpeedMps),
+      averagePaceSecondsPerKm: averagePaceSecondsPerKm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(averagePaceSecondsPerKm),
+      elevationGainMeters: elevationGainMeters == null && nullToAbsent
+          ? const Value.absent()
+          : Value(elevationGainMeters),
+      acceptedPointCount: Value(acceptedPointCount),
+      rejectedPointCount: Value(rejectedPointCount),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      recordVersion: Value(recordVersion),
+    );
+  }
+
+  factory RunningSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RunningSession(
+      localId: serializer.fromJson<String>(json['localId']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      userId: serializer.fromJson<String>(json['userId']),
+      status: serializer.fromJson<String>(json['status']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      endedAt: serializer.fromJson<DateTime?>(json['endedAt']),
+      accumulatedActiveDurationMs: serializer.fromJson<int>(
+        json['accumulatedActiveDurationMs'],
+      ),
+      accumulatedPausedDurationMs: serializer.fromJson<int>(
+        json['accumulatedPausedDurationMs'],
+      ),
+      currentActiveSegmentStartedAt: serializer.fromJson<DateTime?>(
+        json['currentActiveSegmentStartedAt'],
+      ),
+      currentPauseStartedAt: serializer.fromJson<DateTime?>(
+        json['currentPauseStartedAt'],
+      ),
+      totalDistanceMeters: serializer.fromJson<double>(
+        json['totalDistanceMeters'],
+      ),
+      averageSpeedMps: serializer.fromJson<double?>(json['averageSpeedMps']),
+      averagePaceSecondsPerKm: serializer.fromJson<double?>(
+        json['averagePaceSecondsPerKm'],
+      ),
+      elevationGainMeters: serializer.fromJson<double?>(
+        json['elevationGainMeters'],
+      ),
+      acceptedPointCount: serializer.fromJson<int>(json['acceptedPointCount']),
+      rejectedPointCount: serializer.fromJson<int>(json['rejectedPointCount']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      recordVersion: serializer.fromJson<int>(json['recordVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'localId': serializer.toJson<String>(localId),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'userId': serializer.toJson<String>(userId),
+      'status': serializer.toJson<String>(status),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'endedAt': serializer.toJson<DateTime?>(endedAt),
+      'accumulatedActiveDurationMs': serializer.toJson<int>(
+        accumulatedActiveDurationMs,
+      ),
+      'accumulatedPausedDurationMs': serializer.toJson<int>(
+        accumulatedPausedDurationMs,
+      ),
+      'currentActiveSegmentStartedAt': serializer.toJson<DateTime?>(
+        currentActiveSegmentStartedAt,
+      ),
+      'currentPauseStartedAt': serializer.toJson<DateTime?>(
+        currentPauseStartedAt,
+      ),
+      'totalDistanceMeters': serializer.toJson<double>(totalDistanceMeters),
+      'averageSpeedMps': serializer.toJson<double?>(averageSpeedMps),
+      'averagePaceSecondsPerKm': serializer.toJson<double?>(
+        averagePaceSecondsPerKm,
+      ),
+      'elevationGainMeters': serializer.toJson<double?>(elevationGainMeters),
+      'acceptedPointCount': serializer.toJson<int>(acceptedPointCount),
+      'rejectedPointCount': serializer.toJson<int>(rejectedPointCount),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'recordVersion': serializer.toJson<int>(recordVersion),
+    };
+  }
+
+  RunningSession copyWith({
+    String? localId,
+    Value<String?> remoteId = const Value.absent(),
+    String? userId,
+    String? status,
+    DateTime? startedAt,
+    Value<DateTime?> endedAt = const Value.absent(),
+    int? accumulatedActiveDurationMs,
+    int? accumulatedPausedDurationMs,
+    Value<DateTime?> currentActiveSegmentStartedAt = const Value.absent(),
+    Value<DateTime?> currentPauseStartedAt = const Value.absent(),
+    double? totalDistanceMeters,
+    Value<double?> averageSpeedMps = const Value.absent(),
+    Value<double?> averagePaceSecondsPerKm = const Value.absent(),
+    Value<double?> elevationGainMeters = const Value.absent(),
+    int? acceptedPointCount,
+    int? rejectedPointCount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? syncStatus,
+    Value<DateTime?> lastSyncedAt = const Value.absent(),
+    int? recordVersion,
+  }) => RunningSession(
+    localId: localId ?? this.localId,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    userId: userId ?? this.userId,
+    status: status ?? this.status,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    accumulatedActiveDurationMs:
+        accumulatedActiveDurationMs ?? this.accumulatedActiveDurationMs,
+    accumulatedPausedDurationMs:
+        accumulatedPausedDurationMs ?? this.accumulatedPausedDurationMs,
+    currentActiveSegmentStartedAt: currentActiveSegmentStartedAt.present
+        ? currentActiveSegmentStartedAt.value
+        : this.currentActiveSegmentStartedAt,
+    currentPauseStartedAt: currentPauseStartedAt.present
+        ? currentPauseStartedAt.value
+        : this.currentPauseStartedAt,
+    totalDistanceMeters: totalDistanceMeters ?? this.totalDistanceMeters,
+    averageSpeedMps: averageSpeedMps.present
+        ? averageSpeedMps.value
+        : this.averageSpeedMps,
+    averagePaceSecondsPerKm: averagePaceSecondsPerKm.present
+        ? averagePaceSecondsPerKm.value
+        : this.averagePaceSecondsPerKm,
+    elevationGainMeters: elevationGainMeters.present
+        ? elevationGainMeters.value
+        : this.elevationGainMeters,
+    acceptedPointCount: acceptedPointCount ?? this.acceptedPointCount,
+    rejectedPointCount: rejectedPointCount ?? this.rejectedPointCount,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    recordVersion: recordVersion ?? this.recordVersion,
+  );
+  RunningSession copyWithCompanion(RunningSessionsCompanion data) {
+    return RunningSession(
+      localId: data.localId.present ? data.localId.value : this.localId,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      status: data.status.present ? data.status.value : this.status,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      accumulatedActiveDurationMs: data.accumulatedActiveDurationMs.present
+          ? data.accumulatedActiveDurationMs.value
+          : this.accumulatedActiveDurationMs,
+      accumulatedPausedDurationMs: data.accumulatedPausedDurationMs.present
+          ? data.accumulatedPausedDurationMs.value
+          : this.accumulatedPausedDurationMs,
+      currentActiveSegmentStartedAt: data.currentActiveSegmentStartedAt.present
+          ? data.currentActiveSegmentStartedAt.value
+          : this.currentActiveSegmentStartedAt,
+      currentPauseStartedAt: data.currentPauseStartedAt.present
+          ? data.currentPauseStartedAt.value
+          : this.currentPauseStartedAt,
+      totalDistanceMeters: data.totalDistanceMeters.present
+          ? data.totalDistanceMeters.value
+          : this.totalDistanceMeters,
+      averageSpeedMps: data.averageSpeedMps.present
+          ? data.averageSpeedMps.value
+          : this.averageSpeedMps,
+      averagePaceSecondsPerKm: data.averagePaceSecondsPerKm.present
+          ? data.averagePaceSecondsPerKm.value
+          : this.averagePaceSecondsPerKm,
+      elevationGainMeters: data.elevationGainMeters.present
+          ? data.elevationGainMeters.value
+          : this.elevationGainMeters,
+      acceptedPointCount: data.acceptedPointCount.present
+          ? data.acceptedPointCount.value
+          : this.acceptedPointCount,
+      rejectedPointCount: data.rejectedPointCount.present
+          ? data.rejectedPointCount.value
+          : this.rejectedPointCount,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      recordVersion: data.recordVersion.present
+          ? data.recordVersion.value
+          : this.recordVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunningSession(')
+          ..write('localId: $localId, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('userId: $userId, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('accumulatedActiveDurationMs: $accumulatedActiveDurationMs, ')
+          ..write('accumulatedPausedDurationMs: $accumulatedPausedDurationMs, ')
+          ..write(
+            'currentActiveSegmentStartedAt: $currentActiveSegmentStartedAt, ',
+          )
+          ..write('currentPauseStartedAt: $currentPauseStartedAt, ')
+          ..write('totalDistanceMeters: $totalDistanceMeters, ')
+          ..write('averageSpeedMps: $averageSpeedMps, ')
+          ..write('averagePaceSecondsPerKm: $averagePaceSecondsPerKm, ')
+          ..write('elevationGainMeters: $elevationGainMeters, ')
+          ..write('acceptedPointCount: $acceptedPointCount, ')
+          ..write('rejectedPointCount: $rejectedPointCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('recordVersion: $recordVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    localId,
+    remoteId,
+    userId,
+    status,
+    startedAt,
+    endedAt,
+    accumulatedActiveDurationMs,
+    accumulatedPausedDurationMs,
+    currentActiveSegmentStartedAt,
+    currentPauseStartedAt,
+    totalDistanceMeters,
+    averageSpeedMps,
+    averagePaceSecondsPerKm,
+    elevationGainMeters,
+    acceptedPointCount,
+    rejectedPointCount,
+    createdAt,
+    updatedAt,
+    syncStatus,
+    lastSyncedAt,
+    recordVersion,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RunningSession &&
+          other.localId == this.localId &&
+          other.remoteId == this.remoteId &&
+          other.userId == this.userId &&
+          other.status == this.status &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.accumulatedActiveDurationMs ==
+              this.accumulatedActiveDurationMs &&
+          other.accumulatedPausedDurationMs ==
+              this.accumulatedPausedDurationMs &&
+          other.currentActiveSegmentStartedAt ==
+              this.currentActiveSegmentStartedAt &&
+          other.currentPauseStartedAt == this.currentPauseStartedAt &&
+          other.totalDistanceMeters == this.totalDistanceMeters &&
+          other.averageSpeedMps == this.averageSpeedMps &&
+          other.averagePaceSecondsPerKm == this.averagePaceSecondsPerKm &&
+          other.elevationGainMeters == this.elevationGainMeters &&
+          other.acceptedPointCount == this.acceptedPointCount &&
+          other.rejectedPointCount == this.rejectedPointCount &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.recordVersion == this.recordVersion);
+}
+
+class RunningSessionsCompanion extends UpdateCompanion<RunningSession> {
+  final Value<String> localId;
+  final Value<String?> remoteId;
+  final Value<String> userId;
+  final Value<String> status;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> endedAt;
+  final Value<int> accumulatedActiveDurationMs;
+  final Value<int> accumulatedPausedDurationMs;
+  final Value<DateTime?> currentActiveSegmentStartedAt;
+  final Value<DateTime?> currentPauseStartedAt;
+  final Value<double> totalDistanceMeters;
+  final Value<double?> averageSpeedMps;
+  final Value<double?> averagePaceSecondsPerKm;
+  final Value<double?> elevationGainMeters;
+  final Value<int> acceptedPointCount;
+  final Value<int> rejectedPointCount;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> syncStatus;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int> recordVersion;
+  final Value<int> rowid;
+  const RunningSessionsCompanion({
+    this.localId = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.accumulatedActiveDurationMs = const Value.absent(),
+    this.accumulatedPausedDurationMs = const Value.absent(),
+    this.currentActiveSegmentStartedAt = const Value.absent(),
+    this.currentPauseStartedAt = const Value.absent(),
+    this.totalDistanceMeters = const Value.absent(),
+    this.averageSpeedMps = const Value.absent(),
+    this.averagePaceSecondsPerKm = const Value.absent(),
+    this.elevationGainMeters = const Value.absent(),
+    this.acceptedPointCount = const Value.absent(),
+    this.rejectedPointCount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.recordVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RunningSessionsCompanion.insert({
+    required String localId,
+    this.remoteId = const Value.absent(),
+    required String userId,
+    required String status,
+    required DateTime startedAt,
+    this.endedAt = const Value.absent(),
+    this.accumulatedActiveDurationMs = const Value.absent(),
+    this.accumulatedPausedDurationMs = const Value.absent(),
+    this.currentActiveSegmentStartedAt = const Value.absent(),
+    this.currentPauseStartedAt = const Value.absent(),
+    this.totalDistanceMeters = const Value.absent(),
+    this.averageSpeedMps = const Value.absent(),
+    this.averagePaceSecondsPerKm = const Value.absent(),
+    this.elevationGainMeters = const Value.absent(),
+    this.acceptedPointCount = const Value.absent(),
+    this.rejectedPointCount = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.recordVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : localId = Value(localId),
+       userId = Value(userId),
+       status = Value(status),
+       startedAt = Value(startedAt),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<RunningSession> custom({
+    Expression<String>? localId,
+    Expression<String>? remoteId,
+    Expression<String>? userId,
+    Expression<String>? status,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? endedAt,
+    Expression<int>? accumulatedActiveDurationMs,
+    Expression<int>? accumulatedPausedDurationMs,
+    Expression<DateTime>? currentActiveSegmentStartedAt,
+    Expression<DateTime>? currentPauseStartedAt,
+    Expression<double>? totalDistanceMeters,
+    Expression<double>? averageSpeedMps,
+    Expression<double>? averagePaceSecondsPerKm,
+    Expression<double>? elevationGainMeters,
+    Expression<int>? acceptedPointCount,
+    Expression<int>? rejectedPointCount,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? recordVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (localId != null) 'local_id': localId,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (userId != null) 'user_id': userId,
+      if (status != null) 'status': status,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (accumulatedActiveDurationMs != null)
+        'accumulated_active_duration_ms': accumulatedActiveDurationMs,
+      if (accumulatedPausedDurationMs != null)
+        'accumulated_paused_duration_ms': accumulatedPausedDurationMs,
+      if (currentActiveSegmentStartedAt != null)
+        'current_active_segment_started_at': currentActiveSegmentStartedAt,
+      if (currentPauseStartedAt != null)
+        'current_pause_started_at': currentPauseStartedAt,
+      if (totalDistanceMeters != null)
+        'total_distance_meters': totalDistanceMeters,
+      if (averageSpeedMps != null) 'average_speed_mps': averageSpeedMps,
+      if (averagePaceSecondsPerKm != null)
+        'average_pace_seconds_per_km': averagePaceSecondsPerKm,
+      if (elevationGainMeters != null)
+        'elevation_gain_meters': elevationGainMeters,
+      if (acceptedPointCount != null)
+        'accepted_point_count': acceptedPointCount,
+      if (rejectedPointCount != null)
+        'rejected_point_count': rejectedPointCount,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (recordVersion != null) 'record_version': recordVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RunningSessionsCompanion copyWith({
+    Value<String>? localId,
+    Value<String?>? remoteId,
+    Value<String>? userId,
+    Value<String>? status,
+    Value<DateTime>? startedAt,
+    Value<DateTime?>? endedAt,
+    Value<int>? accumulatedActiveDurationMs,
+    Value<int>? accumulatedPausedDurationMs,
+    Value<DateTime?>? currentActiveSegmentStartedAt,
+    Value<DateTime?>? currentPauseStartedAt,
+    Value<double>? totalDistanceMeters,
+    Value<double?>? averageSpeedMps,
+    Value<double?>? averagePaceSecondsPerKm,
+    Value<double?>? elevationGainMeters,
+    Value<int>? acceptedPointCount,
+    Value<int>? rejectedPointCount,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? syncStatus,
+    Value<DateTime?>? lastSyncedAt,
+    Value<int>? recordVersion,
+    Value<int>? rowid,
+  }) {
+    return RunningSessionsCompanion(
+      localId: localId ?? this.localId,
+      remoteId: remoteId ?? this.remoteId,
+      userId: userId ?? this.userId,
+      status: status ?? this.status,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      accumulatedActiveDurationMs:
+          accumulatedActiveDurationMs ?? this.accumulatedActiveDurationMs,
+      accumulatedPausedDurationMs:
+          accumulatedPausedDurationMs ?? this.accumulatedPausedDurationMs,
+      currentActiveSegmentStartedAt:
+          currentActiveSegmentStartedAt ?? this.currentActiveSegmentStartedAt,
+      currentPauseStartedAt:
+          currentPauseStartedAt ?? this.currentPauseStartedAt,
+      totalDistanceMeters: totalDistanceMeters ?? this.totalDistanceMeters,
+      averageSpeedMps: averageSpeedMps ?? this.averageSpeedMps,
+      averagePaceSecondsPerKm:
+          averagePaceSecondsPerKm ?? this.averagePaceSecondsPerKm,
+      elevationGainMeters: elevationGainMeters ?? this.elevationGainMeters,
+      acceptedPointCount: acceptedPointCount ?? this.acceptedPointCount,
+      rejectedPointCount: rejectedPointCount ?? this.rejectedPointCount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      recordVersion: recordVersion ?? this.recordVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (localId.present) {
+      map['local_id'] = Variable<String>(localId.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<DateTime>(endedAt.value);
+    }
+    if (accumulatedActiveDurationMs.present) {
+      map['accumulated_active_duration_ms'] = Variable<int>(
+        accumulatedActiveDurationMs.value,
+      );
+    }
+    if (accumulatedPausedDurationMs.present) {
+      map['accumulated_paused_duration_ms'] = Variable<int>(
+        accumulatedPausedDurationMs.value,
+      );
+    }
+    if (currentActiveSegmentStartedAt.present) {
+      map['current_active_segment_started_at'] = Variable<DateTime>(
+        currentActiveSegmentStartedAt.value,
+      );
+    }
+    if (currentPauseStartedAt.present) {
+      map['current_pause_started_at'] = Variable<DateTime>(
+        currentPauseStartedAt.value,
+      );
+    }
+    if (totalDistanceMeters.present) {
+      map['total_distance_meters'] = Variable<double>(
+        totalDistanceMeters.value,
+      );
+    }
+    if (averageSpeedMps.present) {
+      map['average_speed_mps'] = Variable<double>(averageSpeedMps.value);
+    }
+    if (averagePaceSecondsPerKm.present) {
+      map['average_pace_seconds_per_km'] = Variable<double>(
+        averagePaceSecondsPerKm.value,
+      );
+    }
+    if (elevationGainMeters.present) {
+      map['elevation_gain_meters'] = Variable<double>(
+        elevationGainMeters.value,
+      );
+    }
+    if (acceptedPointCount.present) {
+      map['accepted_point_count'] = Variable<int>(acceptedPointCount.value);
+    }
+    if (rejectedPointCount.present) {
+      map['rejected_point_count'] = Variable<int>(rejectedPointCount.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (recordVersion.present) {
+      map['record_version'] = Variable<int>(recordVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunningSessionsCompanion(')
+          ..write('localId: $localId, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('userId: $userId, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('accumulatedActiveDurationMs: $accumulatedActiveDurationMs, ')
+          ..write('accumulatedPausedDurationMs: $accumulatedPausedDurationMs, ')
+          ..write(
+            'currentActiveSegmentStartedAt: $currentActiveSegmentStartedAt, ',
+          )
+          ..write('currentPauseStartedAt: $currentPauseStartedAt, ')
+          ..write('totalDistanceMeters: $totalDistanceMeters, ')
+          ..write('averageSpeedMps: $averageSpeedMps, ')
+          ..write('averagePaceSecondsPerKm: $averagePaceSecondsPerKm, ')
+          ..write('elevationGainMeters: $elevationGainMeters, ')
+          ..write('acceptedPointCount: $acceptedPointCount, ')
+          ..write('rejectedPointCount: $rejectedPointCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('recordVersion: $recordVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RunningPointsTable extends RunningPoints
+    with TableInfo<$RunningPointsTable, RunningPoint> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RunningPointsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _localIdMeta = const VerificationMeta(
+    'localId',
+  );
+  @override
+  late final GeneratedColumn<String> localId = GeneratedColumn<String>(
+    'local_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _runningSessionLocalIdMeta =
+      const VerificationMeta('runningSessionLocalId');
+  @override
+  late final GeneratedColumn<String> runningSessionLocalId =
+      GeneratedColumn<String>(
+        'running_session_local_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES running_sessions (local_id) ON DELETE CASCADE',
+        ),
+      );
+  static const VerificationMeta _sequenceNumberMeta = const VerificationMeta(
+    'sequenceNumber',
+  );
+  @override
+  late final GeneratedColumn<int> sequenceNumber = GeneratedColumn<int>(
+    'sequence_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _altitudeMeta = const VerificationMeta(
+    'altitude',
+  );
+  @override
+  late final GeneratedColumn<double> altitude = GeneratedColumn<double>(
+    'altitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _horizontalAccuracyMeta =
+      const VerificationMeta('horizontalAccuracy');
+  @override
+  late final GeneratedColumn<double> horizontalAccuracy =
+      GeneratedColumn<double>(
+        'horizontal_accuracy',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _verticalAccuracyMeta = const VerificationMeta(
+    'verticalAccuracy',
+  );
+  @override
+  late final GeneratedColumn<double> verticalAccuracy = GeneratedColumn<double>(
+    'vertical_accuracy',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _providerSpeedMeta = const VerificationMeta(
+    'providerSpeed',
+  );
+  @override
+  late final GeneratedColumn<double> providerSpeed = GeneratedColumn<double>(
+    'provider_speed',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _speedAccuracyMeta = const VerificationMeta(
+    'speedAccuracy',
+  );
+  @override
+  late final GeneratedColumn<double> speedAccuracy = GeneratedColumn<double>(
+    'speed_accuracy',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bearingMeta = const VerificationMeta(
+    'bearing',
+  );
+  @override
+  late final GeneratedColumn<double> bearing = GeneratedColumn<double>(
+    'bearing',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _recordedAtMeta = const VerificationMeta(
+    'recordedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
+    'recorded_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _elapsedRealtimeMsMeta = const VerificationMeta(
+    'elapsedRealtimeMs',
+  );
+  @override
+  late final GeneratedColumn<int> elapsedRealtimeMs = GeneratedColumn<int>(
+    'elapsed_realtime_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _distanceFromPreviousMetersMeta =
+      const VerificationMeta('distanceFromPreviousMeters');
+  @override
+  late final GeneratedColumn<double> distanceFromPreviousMeters =
+      GeneratedColumn<double>(
+        'distance_from_previous_meters',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      );
+  static const VerificationMeta _acceptedMeta = const VerificationMeta(
+    'accepted',
+  );
+  @override
+  late final GeneratedColumn<bool> accepted = GeneratedColumn<bool>(
+    'accepted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("accepted" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _rejectionCodeMeta = const VerificationMeta(
+    'rejectionCode',
+  );
+  @override
+  late final GeneratedColumn<String> rejectionCode = GeneratedColumn<String>(
+    'rejection_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    localId,
+    runningSessionLocalId,
+    sequenceNumber,
+    latitude,
+    longitude,
+    altitude,
+    horizontalAccuracy,
+    verticalAccuracy,
+    providerSpeed,
+    speedAccuracy,
+    bearing,
+    recordedAt,
+    elapsedRealtimeMs,
+    distanceFromPreviousMeters,
+    accepted,
+    rejectionCode,
+    createdAt,
+    syncStatus,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'running_points';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RunningPoint> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('local_id')) {
+      context.handle(
+        _localIdMeta,
+        localId.isAcceptableOrUnknown(data['local_id']!, _localIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localIdMeta);
+    }
+    if (data.containsKey('running_session_local_id')) {
+      context.handle(
+        _runningSessionLocalIdMeta,
+        runningSessionLocalId.isAcceptableOrUnknown(
+          data['running_session_local_id']!,
+          _runningSessionLocalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_runningSessionLocalIdMeta);
+    }
+    if (data.containsKey('sequence_number')) {
+      context.handle(
+        _sequenceNumberMeta,
+        sequenceNumber.isAcceptableOrUnknown(
+          data['sequence_number']!,
+          _sequenceNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceNumberMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latitudeMeta);
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_longitudeMeta);
+    }
+    if (data.containsKey('altitude')) {
+      context.handle(
+        _altitudeMeta,
+        altitude.isAcceptableOrUnknown(data['altitude']!, _altitudeMeta),
+      );
+    }
+    if (data.containsKey('horizontal_accuracy')) {
+      context.handle(
+        _horizontalAccuracyMeta,
+        horizontalAccuracy.isAcceptableOrUnknown(
+          data['horizontal_accuracy']!,
+          _horizontalAccuracyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_horizontalAccuracyMeta);
+    }
+    if (data.containsKey('vertical_accuracy')) {
+      context.handle(
+        _verticalAccuracyMeta,
+        verticalAccuracy.isAcceptableOrUnknown(
+          data['vertical_accuracy']!,
+          _verticalAccuracyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('provider_speed')) {
+      context.handle(
+        _providerSpeedMeta,
+        providerSpeed.isAcceptableOrUnknown(
+          data['provider_speed']!,
+          _providerSpeedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('speed_accuracy')) {
+      context.handle(
+        _speedAccuracyMeta,
+        speedAccuracy.isAcceptableOrUnknown(
+          data['speed_accuracy']!,
+          _speedAccuracyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bearing')) {
+      context.handle(
+        _bearingMeta,
+        bearing.isAcceptableOrUnknown(data['bearing']!, _bearingMeta),
+      );
+    }
+    if (data.containsKey('recorded_at')) {
+      context.handle(
+        _recordedAtMeta,
+        recordedAt.isAcceptableOrUnknown(data['recorded_at']!, _recordedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordedAtMeta);
+    }
+    if (data.containsKey('elapsed_realtime_ms')) {
+      context.handle(
+        _elapsedRealtimeMsMeta,
+        elapsedRealtimeMs.isAcceptableOrUnknown(
+          data['elapsed_realtime_ms']!,
+          _elapsedRealtimeMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('distance_from_previous_meters')) {
+      context.handle(
+        _distanceFromPreviousMetersMeta,
+        distanceFromPreviousMeters.isAcceptableOrUnknown(
+          data['distance_from_previous_meters']!,
+          _distanceFromPreviousMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('accepted')) {
+      context.handle(
+        _acceptedMeta,
+        accepted.isAcceptableOrUnknown(data['accepted']!, _acceptedMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_acceptedMeta);
+    }
+    if (data.containsKey('rejection_code')) {
+      context.handle(
+        _rejectionCodeMeta,
+        rejectionCode.isAcceptableOrUnknown(
+          data['rejection_code']!,
+          _rejectionCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {localId};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {runningSessionLocalId, sequenceNumber},
+  ];
+  @override
+  RunningPoint map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RunningPoint(
+      localId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_id'],
+      )!,
+      runningSessionLocalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}running_session_local_id'],
+      )!,
+      sequenceNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sequence_number'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      )!,
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      )!,
+      altitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}altitude'],
+      ),
+      horizontalAccuracy: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}horizontal_accuracy'],
+      )!,
+      verticalAccuracy: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}vertical_accuracy'],
+      ),
+      providerSpeed: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}provider_speed'],
+      ),
+      speedAccuracy: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}speed_accuracy'],
+      ),
+      bearing: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}bearing'],
+      ),
+      recordedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}recorded_at'],
+      )!,
+      elapsedRealtimeMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}elapsed_realtime_ms'],
+      ),
+      distanceFromPreviousMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}distance_from_previous_meters'],
+      )!,
+      accepted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}accepted'],
+      )!,
+      rejectionCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rejection_code'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+    );
+  }
+
+  @override
+  $RunningPointsTable createAlias(String alias) {
+    return $RunningPointsTable(attachedDatabase, alias);
+  }
+}
+
+class RunningPoint extends DataClass implements Insertable<RunningPoint> {
+  final String localId;
+  final String runningSessionLocalId;
+  final int sequenceNumber;
+  final double latitude;
+  final double longitude;
+  final double? altitude;
+  final double horizontalAccuracy;
+  final double? verticalAccuracy;
+  final double? providerSpeed;
+  final double? speedAccuracy;
+  final double? bearing;
+  final DateTime recordedAt;
+  final int? elapsedRealtimeMs;
+  final double distanceFromPreviousMeters;
+  final bool accepted;
+  final String? rejectionCode;
+  final DateTime createdAt;
+  final String syncStatus;
+  const RunningPoint({
+    required this.localId,
+    required this.runningSessionLocalId,
+    required this.sequenceNumber,
+    required this.latitude,
+    required this.longitude,
+    this.altitude,
+    required this.horizontalAccuracy,
+    this.verticalAccuracy,
+    this.providerSpeed,
+    this.speedAccuracy,
+    this.bearing,
+    required this.recordedAt,
+    this.elapsedRealtimeMs,
+    required this.distanceFromPreviousMeters,
+    required this.accepted,
+    this.rejectionCode,
+    required this.createdAt,
+    required this.syncStatus,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['local_id'] = Variable<String>(localId);
+    map['running_session_local_id'] = Variable<String>(runningSessionLocalId);
+    map['sequence_number'] = Variable<int>(sequenceNumber);
+    map['latitude'] = Variable<double>(latitude);
+    map['longitude'] = Variable<double>(longitude);
+    if (!nullToAbsent || altitude != null) {
+      map['altitude'] = Variable<double>(altitude);
+    }
+    map['horizontal_accuracy'] = Variable<double>(horizontalAccuracy);
+    if (!nullToAbsent || verticalAccuracy != null) {
+      map['vertical_accuracy'] = Variable<double>(verticalAccuracy);
+    }
+    if (!nullToAbsent || providerSpeed != null) {
+      map['provider_speed'] = Variable<double>(providerSpeed);
+    }
+    if (!nullToAbsent || speedAccuracy != null) {
+      map['speed_accuracy'] = Variable<double>(speedAccuracy);
+    }
+    if (!nullToAbsent || bearing != null) {
+      map['bearing'] = Variable<double>(bearing);
+    }
+    map['recorded_at'] = Variable<DateTime>(recordedAt);
+    if (!nullToAbsent || elapsedRealtimeMs != null) {
+      map['elapsed_realtime_ms'] = Variable<int>(elapsedRealtimeMs);
+    }
+    map['distance_from_previous_meters'] = Variable<double>(
+      distanceFromPreviousMeters,
+    );
+    map['accepted'] = Variable<bool>(accepted);
+    if (!nullToAbsent || rejectionCode != null) {
+      map['rejection_code'] = Variable<String>(rejectionCode);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['sync_status'] = Variable<String>(syncStatus);
+    return map;
+  }
+
+  RunningPointsCompanion toCompanion(bool nullToAbsent) {
+    return RunningPointsCompanion(
+      localId: Value(localId),
+      runningSessionLocalId: Value(runningSessionLocalId),
+      sequenceNumber: Value(sequenceNumber),
+      latitude: Value(latitude),
+      longitude: Value(longitude),
+      altitude: altitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(altitude),
+      horizontalAccuracy: Value(horizontalAccuracy),
+      verticalAccuracy: verticalAccuracy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(verticalAccuracy),
+      providerSpeed: providerSpeed == null && nullToAbsent
+          ? const Value.absent()
+          : Value(providerSpeed),
+      speedAccuracy: speedAccuracy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(speedAccuracy),
+      bearing: bearing == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bearing),
+      recordedAt: Value(recordedAt),
+      elapsedRealtimeMs: elapsedRealtimeMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(elapsedRealtimeMs),
+      distanceFromPreviousMeters: Value(distanceFromPreviousMeters),
+      accepted: Value(accepted),
+      rejectionCode: rejectionCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rejectionCode),
+      createdAt: Value(createdAt),
+      syncStatus: Value(syncStatus),
+    );
+  }
+
+  factory RunningPoint.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RunningPoint(
+      localId: serializer.fromJson<String>(json['localId']),
+      runningSessionLocalId: serializer.fromJson<String>(
+        json['runningSessionLocalId'],
+      ),
+      sequenceNumber: serializer.fromJson<int>(json['sequenceNumber']),
+      latitude: serializer.fromJson<double>(json['latitude']),
+      longitude: serializer.fromJson<double>(json['longitude']),
+      altitude: serializer.fromJson<double?>(json['altitude']),
+      horizontalAccuracy: serializer.fromJson<double>(
+        json['horizontalAccuracy'],
+      ),
+      verticalAccuracy: serializer.fromJson<double?>(json['verticalAccuracy']),
+      providerSpeed: serializer.fromJson<double?>(json['providerSpeed']),
+      speedAccuracy: serializer.fromJson<double?>(json['speedAccuracy']),
+      bearing: serializer.fromJson<double?>(json['bearing']),
+      recordedAt: serializer.fromJson<DateTime>(json['recordedAt']),
+      elapsedRealtimeMs: serializer.fromJson<int?>(json['elapsedRealtimeMs']),
+      distanceFromPreviousMeters: serializer.fromJson<double>(
+        json['distanceFromPreviousMeters'],
+      ),
+      accepted: serializer.fromJson<bool>(json['accepted']),
+      rejectionCode: serializer.fromJson<String?>(json['rejectionCode']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'localId': serializer.toJson<String>(localId),
+      'runningSessionLocalId': serializer.toJson<String>(runningSessionLocalId),
+      'sequenceNumber': serializer.toJson<int>(sequenceNumber),
+      'latitude': serializer.toJson<double>(latitude),
+      'longitude': serializer.toJson<double>(longitude),
+      'altitude': serializer.toJson<double?>(altitude),
+      'horizontalAccuracy': serializer.toJson<double>(horizontalAccuracy),
+      'verticalAccuracy': serializer.toJson<double?>(verticalAccuracy),
+      'providerSpeed': serializer.toJson<double?>(providerSpeed),
+      'speedAccuracy': serializer.toJson<double?>(speedAccuracy),
+      'bearing': serializer.toJson<double?>(bearing),
+      'recordedAt': serializer.toJson<DateTime>(recordedAt),
+      'elapsedRealtimeMs': serializer.toJson<int?>(elapsedRealtimeMs),
+      'distanceFromPreviousMeters': serializer.toJson<double>(
+        distanceFromPreviousMeters,
+      ),
+      'accepted': serializer.toJson<bool>(accepted),
+      'rejectionCode': serializer.toJson<String?>(rejectionCode),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+    };
+  }
+
+  RunningPoint copyWith({
+    String? localId,
+    String? runningSessionLocalId,
+    int? sequenceNumber,
+    double? latitude,
+    double? longitude,
+    Value<double?> altitude = const Value.absent(),
+    double? horizontalAccuracy,
+    Value<double?> verticalAccuracy = const Value.absent(),
+    Value<double?> providerSpeed = const Value.absent(),
+    Value<double?> speedAccuracy = const Value.absent(),
+    Value<double?> bearing = const Value.absent(),
+    DateTime? recordedAt,
+    Value<int?> elapsedRealtimeMs = const Value.absent(),
+    double? distanceFromPreviousMeters,
+    bool? accepted,
+    Value<String?> rejectionCode = const Value.absent(),
+    DateTime? createdAt,
+    String? syncStatus,
+  }) => RunningPoint(
+    localId: localId ?? this.localId,
+    runningSessionLocalId: runningSessionLocalId ?? this.runningSessionLocalId,
+    sequenceNumber: sequenceNumber ?? this.sequenceNumber,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+    altitude: altitude.present ? altitude.value : this.altitude,
+    horizontalAccuracy: horizontalAccuracy ?? this.horizontalAccuracy,
+    verticalAccuracy: verticalAccuracy.present
+        ? verticalAccuracy.value
+        : this.verticalAccuracy,
+    providerSpeed: providerSpeed.present
+        ? providerSpeed.value
+        : this.providerSpeed,
+    speedAccuracy: speedAccuracy.present
+        ? speedAccuracy.value
+        : this.speedAccuracy,
+    bearing: bearing.present ? bearing.value : this.bearing,
+    recordedAt: recordedAt ?? this.recordedAt,
+    elapsedRealtimeMs: elapsedRealtimeMs.present
+        ? elapsedRealtimeMs.value
+        : this.elapsedRealtimeMs,
+    distanceFromPreviousMeters:
+        distanceFromPreviousMeters ?? this.distanceFromPreviousMeters,
+    accepted: accepted ?? this.accepted,
+    rejectionCode: rejectionCode.present
+        ? rejectionCode.value
+        : this.rejectionCode,
+    createdAt: createdAt ?? this.createdAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+  );
+  RunningPoint copyWithCompanion(RunningPointsCompanion data) {
+    return RunningPoint(
+      localId: data.localId.present ? data.localId.value : this.localId,
+      runningSessionLocalId: data.runningSessionLocalId.present
+          ? data.runningSessionLocalId.value
+          : this.runningSessionLocalId,
+      sequenceNumber: data.sequenceNumber.present
+          ? data.sequenceNumber.value
+          : this.sequenceNumber,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      altitude: data.altitude.present ? data.altitude.value : this.altitude,
+      horizontalAccuracy: data.horizontalAccuracy.present
+          ? data.horizontalAccuracy.value
+          : this.horizontalAccuracy,
+      verticalAccuracy: data.verticalAccuracy.present
+          ? data.verticalAccuracy.value
+          : this.verticalAccuracy,
+      providerSpeed: data.providerSpeed.present
+          ? data.providerSpeed.value
+          : this.providerSpeed,
+      speedAccuracy: data.speedAccuracy.present
+          ? data.speedAccuracy.value
+          : this.speedAccuracy,
+      bearing: data.bearing.present ? data.bearing.value : this.bearing,
+      recordedAt: data.recordedAt.present
+          ? data.recordedAt.value
+          : this.recordedAt,
+      elapsedRealtimeMs: data.elapsedRealtimeMs.present
+          ? data.elapsedRealtimeMs.value
+          : this.elapsedRealtimeMs,
+      distanceFromPreviousMeters: data.distanceFromPreviousMeters.present
+          ? data.distanceFromPreviousMeters.value
+          : this.distanceFromPreviousMeters,
+      accepted: data.accepted.present ? data.accepted.value : this.accepted,
+      rejectionCode: data.rejectionCode.present
+          ? data.rejectionCode.value
+          : this.rejectionCode,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunningPoint(')
+          ..write('localId: $localId, ')
+          ..write('runningSessionLocalId: $runningSessionLocalId, ')
+          ..write('sequenceNumber: $sequenceNumber, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude, ')
+          ..write('horizontalAccuracy: $horizontalAccuracy, ')
+          ..write('verticalAccuracy: $verticalAccuracy, ')
+          ..write('providerSpeed: $providerSpeed, ')
+          ..write('speedAccuracy: $speedAccuracy, ')
+          ..write('bearing: $bearing, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('elapsedRealtimeMs: $elapsedRealtimeMs, ')
+          ..write('distanceFromPreviousMeters: $distanceFromPreviousMeters, ')
+          ..write('accepted: $accepted, ')
+          ..write('rejectionCode: $rejectionCode, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    localId,
+    runningSessionLocalId,
+    sequenceNumber,
+    latitude,
+    longitude,
+    altitude,
+    horizontalAccuracy,
+    verticalAccuracy,
+    providerSpeed,
+    speedAccuracy,
+    bearing,
+    recordedAt,
+    elapsedRealtimeMs,
+    distanceFromPreviousMeters,
+    accepted,
+    rejectionCode,
+    createdAt,
+    syncStatus,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RunningPoint &&
+          other.localId == this.localId &&
+          other.runningSessionLocalId == this.runningSessionLocalId &&
+          other.sequenceNumber == this.sequenceNumber &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.altitude == this.altitude &&
+          other.horizontalAccuracy == this.horizontalAccuracy &&
+          other.verticalAccuracy == this.verticalAccuracy &&
+          other.providerSpeed == this.providerSpeed &&
+          other.speedAccuracy == this.speedAccuracy &&
+          other.bearing == this.bearing &&
+          other.recordedAt == this.recordedAt &&
+          other.elapsedRealtimeMs == this.elapsedRealtimeMs &&
+          other.distanceFromPreviousMeters == this.distanceFromPreviousMeters &&
+          other.accepted == this.accepted &&
+          other.rejectionCode == this.rejectionCode &&
+          other.createdAt == this.createdAt &&
+          other.syncStatus == this.syncStatus);
+}
+
+class RunningPointsCompanion extends UpdateCompanion<RunningPoint> {
+  final Value<String> localId;
+  final Value<String> runningSessionLocalId;
+  final Value<int> sequenceNumber;
+  final Value<double> latitude;
+  final Value<double> longitude;
+  final Value<double?> altitude;
+  final Value<double> horizontalAccuracy;
+  final Value<double?> verticalAccuracy;
+  final Value<double?> providerSpeed;
+  final Value<double?> speedAccuracy;
+  final Value<double?> bearing;
+  final Value<DateTime> recordedAt;
+  final Value<int?> elapsedRealtimeMs;
+  final Value<double> distanceFromPreviousMeters;
+  final Value<bool> accepted;
+  final Value<String?> rejectionCode;
+  final Value<DateTime> createdAt;
+  final Value<String> syncStatus;
+  final Value<int> rowid;
+  const RunningPointsCompanion({
+    this.localId = const Value.absent(),
+    this.runningSessionLocalId = const Value.absent(),
+    this.sequenceNumber = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.altitude = const Value.absent(),
+    this.horizontalAccuracy = const Value.absent(),
+    this.verticalAccuracy = const Value.absent(),
+    this.providerSpeed = const Value.absent(),
+    this.speedAccuracy = const Value.absent(),
+    this.bearing = const Value.absent(),
+    this.recordedAt = const Value.absent(),
+    this.elapsedRealtimeMs = const Value.absent(),
+    this.distanceFromPreviousMeters = const Value.absent(),
+    this.accepted = const Value.absent(),
+    this.rejectionCode = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RunningPointsCompanion.insert({
+    required String localId,
+    required String runningSessionLocalId,
+    required int sequenceNumber,
+    required double latitude,
+    required double longitude,
+    this.altitude = const Value.absent(),
+    required double horizontalAccuracy,
+    this.verticalAccuracy = const Value.absent(),
+    this.providerSpeed = const Value.absent(),
+    this.speedAccuracy = const Value.absent(),
+    this.bearing = const Value.absent(),
+    required DateTime recordedAt,
+    this.elapsedRealtimeMs = const Value.absent(),
+    this.distanceFromPreviousMeters = const Value.absent(),
+    required bool accepted,
+    this.rejectionCode = const Value.absent(),
+    required DateTime createdAt,
+    this.syncStatus = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : localId = Value(localId),
+       runningSessionLocalId = Value(runningSessionLocalId),
+       sequenceNumber = Value(sequenceNumber),
+       latitude = Value(latitude),
+       longitude = Value(longitude),
+       horizontalAccuracy = Value(horizontalAccuracy),
+       recordedAt = Value(recordedAt),
+       accepted = Value(accepted),
+       createdAt = Value(createdAt);
+  static Insertable<RunningPoint> custom({
+    Expression<String>? localId,
+    Expression<String>? runningSessionLocalId,
+    Expression<int>? sequenceNumber,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<double>? altitude,
+    Expression<double>? horizontalAccuracy,
+    Expression<double>? verticalAccuracy,
+    Expression<double>? providerSpeed,
+    Expression<double>? speedAccuracy,
+    Expression<double>? bearing,
+    Expression<DateTime>? recordedAt,
+    Expression<int>? elapsedRealtimeMs,
+    Expression<double>? distanceFromPreviousMeters,
+    Expression<bool>? accepted,
+    Expression<String>? rejectionCode,
+    Expression<DateTime>? createdAt,
+    Expression<String>? syncStatus,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (localId != null) 'local_id': localId,
+      if (runningSessionLocalId != null)
+        'running_session_local_id': runningSessionLocalId,
+      if (sequenceNumber != null) 'sequence_number': sequenceNumber,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (altitude != null) 'altitude': altitude,
+      if (horizontalAccuracy != null) 'horizontal_accuracy': horizontalAccuracy,
+      if (verticalAccuracy != null) 'vertical_accuracy': verticalAccuracy,
+      if (providerSpeed != null) 'provider_speed': providerSpeed,
+      if (speedAccuracy != null) 'speed_accuracy': speedAccuracy,
+      if (bearing != null) 'bearing': bearing,
+      if (recordedAt != null) 'recorded_at': recordedAt,
+      if (elapsedRealtimeMs != null) 'elapsed_realtime_ms': elapsedRealtimeMs,
+      if (distanceFromPreviousMeters != null)
+        'distance_from_previous_meters': distanceFromPreviousMeters,
+      if (accepted != null) 'accepted': accepted,
+      if (rejectionCode != null) 'rejection_code': rejectionCode,
+      if (createdAt != null) 'created_at': createdAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RunningPointsCompanion copyWith({
+    Value<String>? localId,
+    Value<String>? runningSessionLocalId,
+    Value<int>? sequenceNumber,
+    Value<double>? latitude,
+    Value<double>? longitude,
+    Value<double?>? altitude,
+    Value<double>? horizontalAccuracy,
+    Value<double?>? verticalAccuracy,
+    Value<double?>? providerSpeed,
+    Value<double?>? speedAccuracy,
+    Value<double?>? bearing,
+    Value<DateTime>? recordedAt,
+    Value<int?>? elapsedRealtimeMs,
+    Value<double>? distanceFromPreviousMeters,
+    Value<bool>? accepted,
+    Value<String?>? rejectionCode,
+    Value<DateTime>? createdAt,
+    Value<String>? syncStatus,
+    Value<int>? rowid,
+  }) {
+    return RunningPointsCompanion(
+      localId: localId ?? this.localId,
+      runningSessionLocalId:
+          runningSessionLocalId ?? this.runningSessionLocalId,
+      sequenceNumber: sequenceNumber ?? this.sequenceNumber,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      altitude: altitude ?? this.altitude,
+      horizontalAccuracy: horizontalAccuracy ?? this.horizontalAccuracy,
+      verticalAccuracy: verticalAccuracy ?? this.verticalAccuracy,
+      providerSpeed: providerSpeed ?? this.providerSpeed,
+      speedAccuracy: speedAccuracy ?? this.speedAccuracy,
+      bearing: bearing ?? this.bearing,
+      recordedAt: recordedAt ?? this.recordedAt,
+      elapsedRealtimeMs: elapsedRealtimeMs ?? this.elapsedRealtimeMs,
+      distanceFromPreviousMeters:
+          distanceFromPreviousMeters ?? this.distanceFromPreviousMeters,
+      accepted: accepted ?? this.accepted,
+      rejectionCode: rejectionCode ?? this.rejectionCode,
+      createdAt: createdAt ?? this.createdAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (localId.present) {
+      map['local_id'] = Variable<String>(localId.value);
+    }
+    if (runningSessionLocalId.present) {
+      map['running_session_local_id'] = Variable<String>(
+        runningSessionLocalId.value,
+      );
+    }
+    if (sequenceNumber.present) {
+      map['sequence_number'] = Variable<int>(sequenceNumber.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (altitude.present) {
+      map['altitude'] = Variable<double>(altitude.value);
+    }
+    if (horizontalAccuracy.present) {
+      map['horizontal_accuracy'] = Variable<double>(horizontalAccuracy.value);
+    }
+    if (verticalAccuracy.present) {
+      map['vertical_accuracy'] = Variable<double>(verticalAccuracy.value);
+    }
+    if (providerSpeed.present) {
+      map['provider_speed'] = Variable<double>(providerSpeed.value);
+    }
+    if (speedAccuracy.present) {
+      map['speed_accuracy'] = Variable<double>(speedAccuracy.value);
+    }
+    if (bearing.present) {
+      map['bearing'] = Variable<double>(bearing.value);
+    }
+    if (recordedAt.present) {
+      map['recorded_at'] = Variable<DateTime>(recordedAt.value);
+    }
+    if (elapsedRealtimeMs.present) {
+      map['elapsed_realtime_ms'] = Variable<int>(elapsedRealtimeMs.value);
+    }
+    if (distanceFromPreviousMeters.present) {
+      map['distance_from_previous_meters'] = Variable<double>(
+        distanceFromPreviousMeters.value,
+      );
+    }
+    if (accepted.present) {
+      map['accepted'] = Variable<bool>(accepted.value);
+    }
+    if (rejectionCode.present) {
+      map['rejection_code'] = Variable<String>(rejectionCode.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunningPointsCompanion(')
+          ..write('localId: $localId, ')
+          ..write('runningSessionLocalId: $runningSessionLocalId, ')
+          ..write('sequenceNumber: $sequenceNumber, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude, ')
+          ..write('horizontalAccuracy: $horizontalAccuracy, ')
+          ..write('verticalAccuracy: $verticalAccuracy, ')
+          ..write('providerSpeed: $providerSpeed, ')
+          ..write('speedAccuracy: $speedAccuracy, ')
+          ..write('bearing: $bearing, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('elapsedRealtimeMs: $elapsedRealtimeMs, ')
+          ..write('distanceFromPreviousMeters: $distanceFromPreviousMeters, ')
+          ..write('accepted: $accepted, ')
+          ..write('rejectionCode: $rejectionCode, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$LocalDatabase extends GeneratedDatabase {
   _$LocalDatabase(QueryExecutor e) : super(e);
   $LocalDatabaseManager get managers => $LocalDatabaseManager(this);
@@ -3060,6 +5421,10 @@ abstract class _$LocalDatabase extends GeneratedDatabase {
   );
   late final $RepEventsTable repEvents = $RepEventsTable(this);
   late final $SyncQueueItemsTable syncQueueItems = $SyncQueueItemsTable(this);
+  late final $RunningSessionsTable runningSessions = $RunningSessionsTable(
+    this,
+  );
+  late final $RunningPointsTable runningPoints = $RunningPointsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3068,6 +5433,8 @@ abstract class _$LocalDatabase extends GeneratedDatabase {
     workoutSessions,
     repEvents,
     syncQueueItems,
+    runningSessions,
+    runningPoints,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3077,6 +5444,13 @@ abstract class _$LocalDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('rep_events', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'running_sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('running_points', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -4660,6 +7034,1251 @@ typedef $$SyncQueueItemsTableProcessedTableManager =
       SyncQueueItem,
       PrefetchHooks Function()
     >;
+typedef $$RunningSessionsTableCreateCompanionBuilder =
+    RunningSessionsCompanion Function({
+      required String localId,
+      Value<String?> remoteId,
+      required String userId,
+      required String status,
+      required DateTime startedAt,
+      Value<DateTime?> endedAt,
+      Value<int> accumulatedActiveDurationMs,
+      Value<int> accumulatedPausedDurationMs,
+      Value<DateTime?> currentActiveSegmentStartedAt,
+      Value<DateTime?> currentPauseStartedAt,
+      Value<double> totalDistanceMeters,
+      Value<double?> averageSpeedMps,
+      Value<double?> averagePaceSecondsPerKm,
+      Value<double?> elevationGainMeters,
+      Value<int> acceptedPointCount,
+      Value<int> rejectedPointCount,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<String> syncStatus,
+      Value<DateTime?> lastSyncedAt,
+      Value<int> recordVersion,
+      Value<int> rowid,
+    });
+typedef $$RunningSessionsTableUpdateCompanionBuilder =
+    RunningSessionsCompanion Function({
+      Value<String> localId,
+      Value<String?> remoteId,
+      Value<String> userId,
+      Value<String> status,
+      Value<DateTime> startedAt,
+      Value<DateTime?> endedAt,
+      Value<int> accumulatedActiveDurationMs,
+      Value<int> accumulatedPausedDurationMs,
+      Value<DateTime?> currentActiveSegmentStartedAt,
+      Value<DateTime?> currentPauseStartedAt,
+      Value<double> totalDistanceMeters,
+      Value<double?> averageSpeedMps,
+      Value<double?> averagePaceSecondsPerKm,
+      Value<double?> elevationGainMeters,
+      Value<int> acceptedPointCount,
+      Value<int> rejectedPointCount,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> syncStatus,
+      Value<DateTime?> lastSyncedAt,
+      Value<int> recordVersion,
+      Value<int> rowid,
+    });
+
+final class $$RunningSessionsTableReferences
+    extends
+        BaseReferences<_$LocalDatabase, $RunningSessionsTable, RunningSession> {
+  $$RunningSessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$RunningPointsTable, List<RunningPoint>>
+  _runningPointsRefsTable(_$LocalDatabase db) => MultiTypedResultKey.fromTable(
+    db.runningPoints,
+    aliasName:
+        'running_sessions__local_id__running_points__running_session_local_id',
+  );
+
+  $$RunningPointsTableProcessedTableManager get runningPointsRefs {
+    final manager = $$RunningPointsTableTableManager($_db, $_db.runningPoints)
+        .filter(
+          (f) => f.runningSessionLocalId.localId.sqlEquals(
+            $_itemColumn<String>('local_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_runningPointsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$RunningSessionsTableFilterComposer
+    extends Composer<_$LocalDatabase, $RunningSessionsTable> {
+  $$RunningSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get localId => $composableBuilder(
+    column: $table.localId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get accumulatedActiveDurationMs => $composableBuilder(
+    column: $table.accumulatedActiveDurationMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get accumulatedPausedDurationMs => $composableBuilder(
+    column: $table.accumulatedPausedDurationMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get currentActiveSegmentStartedAt =>
+      $composableBuilder(
+        column: $table.currentActiveSegmentStartedAt,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<DateTime> get currentPauseStartedAt => $composableBuilder(
+    column: $table.currentPauseStartedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get totalDistanceMeters => $composableBuilder(
+    column: $table.totalDistanceMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get averageSpeedMps => $composableBuilder(
+    column: $table.averageSpeedMps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get averagePaceSecondsPerKm => $composableBuilder(
+    column: $table.averagePaceSecondsPerKm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get elevationGainMeters => $composableBuilder(
+    column: $table.elevationGainMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get acceptedPointCount => $composableBuilder(
+    column: $table.acceptedPointCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rejectedPointCount => $composableBuilder(
+    column: $table.rejectedPointCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get recordVersion => $composableBuilder(
+    column: $table.recordVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> runningPointsRefs(
+    Expression<bool> Function($$RunningPointsTableFilterComposer f) f,
+  ) {
+    final $$RunningPointsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.runningPoints,
+      getReferencedColumn: (t) => t.runningSessionLocalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunningPointsTableFilterComposer(
+            $db: $db,
+            $table: $db.runningPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$RunningSessionsTableOrderingComposer
+    extends Composer<_$LocalDatabase, $RunningSessionsTable> {
+  $$RunningSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get localId => $composableBuilder(
+    column: $table.localId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get accumulatedActiveDurationMs => $composableBuilder(
+    column: $table.accumulatedActiveDurationMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get accumulatedPausedDurationMs => $composableBuilder(
+    column: $table.accumulatedPausedDurationMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get currentActiveSegmentStartedAt =>
+      $composableBuilder(
+        column: $table.currentActiveSegmentStartedAt,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<DateTime> get currentPauseStartedAt => $composableBuilder(
+    column: $table.currentPauseStartedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get totalDistanceMeters => $composableBuilder(
+    column: $table.totalDistanceMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get averageSpeedMps => $composableBuilder(
+    column: $table.averageSpeedMps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get averagePaceSecondsPerKm => $composableBuilder(
+    column: $table.averagePaceSecondsPerKm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get elevationGainMeters => $composableBuilder(
+    column: $table.elevationGainMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get acceptedPointCount => $composableBuilder(
+    column: $table.acceptedPointCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rejectedPointCount => $composableBuilder(
+    column: $table.rejectedPointCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get recordVersion => $composableBuilder(
+    column: $table.recordVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RunningSessionsTableAnnotationComposer
+    extends Composer<_$LocalDatabase, $RunningSessionsTable> {
+  $$RunningSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get localId =>
+      $composableBuilder(column: $table.localId, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get accumulatedActiveDurationMs => $composableBuilder(
+    column: $table.accumulatedActiveDurationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get accumulatedPausedDurationMs => $composableBuilder(
+    column: $table.accumulatedPausedDurationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get currentActiveSegmentStartedAt =>
+      $composableBuilder(
+        column: $table.currentActiveSegmentStartedAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<DateTime> get currentPauseStartedAt => $composableBuilder(
+    column: $table.currentPauseStartedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get totalDistanceMeters => $composableBuilder(
+    column: $table.totalDistanceMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get averageSpeedMps => $composableBuilder(
+    column: $table.averageSpeedMps,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get averagePaceSecondsPerKm => $composableBuilder(
+    column: $table.averagePaceSecondsPerKm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get elevationGainMeters => $composableBuilder(
+    column: $table.elevationGainMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get acceptedPointCount => $composableBuilder(
+    column: $table.acceptedPointCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get rejectedPointCount => $composableBuilder(
+    column: $table.rejectedPointCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get recordVersion => $composableBuilder(
+    column: $table.recordVersion,
+    builder: (column) => column,
+  );
+
+  Expression<T> runningPointsRefs<T extends Object>(
+    Expression<T> Function($$RunningPointsTableAnnotationComposer a) f,
+  ) {
+    final $$RunningPointsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.runningPoints,
+      getReferencedColumn: (t) => t.runningSessionLocalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunningPointsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.runningPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$RunningSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$LocalDatabase,
+          $RunningSessionsTable,
+          RunningSession,
+          $$RunningSessionsTableFilterComposer,
+          $$RunningSessionsTableOrderingComposer,
+          $$RunningSessionsTableAnnotationComposer,
+          $$RunningSessionsTableCreateCompanionBuilder,
+          $$RunningSessionsTableUpdateCompanionBuilder,
+          (RunningSession, $$RunningSessionsTableReferences),
+          RunningSession,
+          PrefetchHooks Function({bool runningPointsRefs})
+        > {
+  $$RunningSessionsTableTableManager(
+    _$LocalDatabase db,
+    $RunningSessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RunningSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RunningSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RunningSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> localId = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> startedAt = const Value.absent(),
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<int> accumulatedActiveDurationMs = const Value.absent(),
+                Value<int> accumulatedPausedDurationMs = const Value.absent(),
+                Value<DateTime?> currentActiveSegmentStartedAt =
+                    const Value.absent(),
+                Value<DateTime?> currentPauseStartedAt = const Value.absent(),
+                Value<double> totalDistanceMeters = const Value.absent(),
+                Value<double?> averageSpeedMps = const Value.absent(),
+                Value<double?> averagePaceSecondsPerKm = const Value.absent(),
+                Value<double?> elevationGainMeters = const Value.absent(),
+                Value<int> acceptedPointCount = const Value.absent(),
+                Value<int> rejectedPointCount = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<DateTime?> lastSyncedAt = const Value.absent(),
+                Value<int> recordVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RunningSessionsCompanion(
+                localId: localId,
+                remoteId: remoteId,
+                userId: userId,
+                status: status,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                accumulatedActiveDurationMs: accumulatedActiveDurationMs,
+                accumulatedPausedDurationMs: accumulatedPausedDurationMs,
+                currentActiveSegmentStartedAt: currentActiveSegmentStartedAt,
+                currentPauseStartedAt: currentPauseStartedAt,
+                totalDistanceMeters: totalDistanceMeters,
+                averageSpeedMps: averageSpeedMps,
+                averagePaceSecondsPerKm: averagePaceSecondsPerKm,
+                elevationGainMeters: elevationGainMeters,
+                acceptedPointCount: acceptedPointCount,
+                rejectedPointCount: rejectedPointCount,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                recordVersion: recordVersion,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String localId,
+                Value<String?> remoteId = const Value.absent(),
+                required String userId,
+                required String status,
+                required DateTime startedAt,
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<int> accumulatedActiveDurationMs = const Value.absent(),
+                Value<int> accumulatedPausedDurationMs = const Value.absent(),
+                Value<DateTime?> currentActiveSegmentStartedAt =
+                    const Value.absent(),
+                Value<DateTime?> currentPauseStartedAt = const Value.absent(),
+                Value<double> totalDistanceMeters = const Value.absent(),
+                Value<double?> averageSpeedMps = const Value.absent(),
+                Value<double?> averagePaceSecondsPerKm = const Value.absent(),
+                Value<double?> elevationGainMeters = const Value.absent(),
+                Value<int> acceptedPointCount = const Value.absent(),
+                Value<int> rejectedPointCount = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<String> syncStatus = const Value.absent(),
+                Value<DateTime?> lastSyncedAt = const Value.absent(),
+                Value<int> recordVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RunningSessionsCompanion.insert(
+                localId: localId,
+                remoteId: remoteId,
+                userId: userId,
+                status: status,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                accumulatedActiveDurationMs: accumulatedActiveDurationMs,
+                accumulatedPausedDurationMs: accumulatedPausedDurationMs,
+                currentActiveSegmentStartedAt: currentActiveSegmentStartedAt,
+                currentPauseStartedAt: currentPauseStartedAt,
+                totalDistanceMeters: totalDistanceMeters,
+                averageSpeedMps: averageSpeedMps,
+                averagePaceSecondsPerKm: averagePaceSecondsPerKm,
+                elevationGainMeters: elevationGainMeters,
+                acceptedPointCount: acceptedPointCount,
+                rejectedPointCount: rejectedPointCount,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                recordVersion: recordVersion,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RunningSessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({runningPointsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (runningPointsRefs) db.runningPoints,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (runningPointsRefs)
+                    await $_getPrefetchedData<
+                      RunningSession,
+                      $RunningSessionsTable,
+                      RunningPoint
+                    >(
+                      currentTable: table,
+                      referencedTable: $$RunningSessionsTableReferences
+                          ._runningPointsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$RunningSessionsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).runningPointsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.runningSessionLocalId == item.localId,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RunningSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LocalDatabase,
+      $RunningSessionsTable,
+      RunningSession,
+      $$RunningSessionsTableFilterComposer,
+      $$RunningSessionsTableOrderingComposer,
+      $$RunningSessionsTableAnnotationComposer,
+      $$RunningSessionsTableCreateCompanionBuilder,
+      $$RunningSessionsTableUpdateCompanionBuilder,
+      (RunningSession, $$RunningSessionsTableReferences),
+      RunningSession,
+      PrefetchHooks Function({bool runningPointsRefs})
+    >;
+typedef $$RunningPointsTableCreateCompanionBuilder =
+    RunningPointsCompanion Function({
+      required String localId,
+      required String runningSessionLocalId,
+      required int sequenceNumber,
+      required double latitude,
+      required double longitude,
+      Value<double?> altitude,
+      required double horizontalAccuracy,
+      Value<double?> verticalAccuracy,
+      Value<double?> providerSpeed,
+      Value<double?> speedAccuracy,
+      Value<double?> bearing,
+      required DateTime recordedAt,
+      Value<int?> elapsedRealtimeMs,
+      Value<double> distanceFromPreviousMeters,
+      required bool accepted,
+      Value<String?> rejectionCode,
+      required DateTime createdAt,
+      Value<String> syncStatus,
+      Value<int> rowid,
+    });
+typedef $$RunningPointsTableUpdateCompanionBuilder =
+    RunningPointsCompanion Function({
+      Value<String> localId,
+      Value<String> runningSessionLocalId,
+      Value<int> sequenceNumber,
+      Value<double> latitude,
+      Value<double> longitude,
+      Value<double?> altitude,
+      Value<double> horizontalAccuracy,
+      Value<double?> verticalAccuracy,
+      Value<double?> providerSpeed,
+      Value<double?> speedAccuracy,
+      Value<double?> bearing,
+      Value<DateTime> recordedAt,
+      Value<int?> elapsedRealtimeMs,
+      Value<double> distanceFromPreviousMeters,
+      Value<bool> accepted,
+      Value<String?> rejectionCode,
+      Value<DateTime> createdAt,
+      Value<String> syncStatus,
+      Value<int> rowid,
+    });
+
+final class $$RunningPointsTableReferences
+    extends BaseReferences<_$LocalDatabase, $RunningPointsTable, RunningPoint> {
+  $$RunningPointsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $RunningSessionsTable _runningSessionLocalIdTable(
+    _$LocalDatabase db,
+  ) => db.runningSessions.createAlias(
+    'running_points__running_session_local_id__running_sessions__local_id',
+  );
+
+  $$RunningSessionsTableProcessedTableManager get runningSessionLocalId {
+    final $_column = $_itemColumn<String>('running_session_local_id')!;
+
+    final manager = $$RunningSessionsTableTableManager(
+      $_db,
+      $_db.runningSessions,
+    ).filter((f) => f.localId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _runningSessionLocalIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RunningPointsTableFilterComposer
+    extends Composer<_$LocalDatabase, $RunningPointsTable> {
+  $$RunningPointsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get localId => $composableBuilder(
+    column: $table.localId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sequenceNumber => $composableBuilder(
+    column: $table.sequenceNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get altitude => $composableBuilder(
+    column: $table.altitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get horizontalAccuracy => $composableBuilder(
+    column: $table.horizontalAccuracy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get verticalAccuracy => $composableBuilder(
+    column: $table.verticalAccuracy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get providerSpeed => $composableBuilder(
+    column: $table.providerSpeed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get speedAccuracy => $composableBuilder(
+    column: $table.speedAccuracy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get bearing => $composableBuilder(
+    column: $table.bearing,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get elapsedRealtimeMs => $composableBuilder(
+    column: $table.elapsedRealtimeMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get distanceFromPreviousMeters => $composableBuilder(
+    column: $table.distanceFromPreviousMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get accepted => $composableBuilder(
+    column: $table.accepted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rejectionCode => $composableBuilder(
+    column: $table.rejectionCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RunningSessionsTableFilterComposer get runningSessionLocalId {
+    final $$RunningSessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runningSessionLocalId,
+      referencedTable: $db.runningSessions,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunningSessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.runningSessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunningPointsTableOrderingComposer
+    extends Composer<_$LocalDatabase, $RunningPointsTable> {
+  $$RunningPointsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get localId => $composableBuilder(
+    column: $table.localId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sequenceNumber => $composableBuilder(
+    column: $table.sequenceNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get altitude => $composableBuilder(
+    column: $table.altitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get horizontalAccuracy => $composableBuilder(
+    column: $table.horizontalAccuracy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get verticalAccuracy => $composableBuilder(
+    column: $table.verticalAccuracy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get providerSpeed => $composableBuilder(
+    column: $table.providerSpeed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get speedAccuracy => $composableBuilder(
+    column: $table.speedAccuracy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get bearing => $composableBuilder(
+    column: $table.bearing,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get elapsedRealtimeMs => $composableBuilder(
+    column: $table.elapsedRealtimeMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get distanceFromPreviousMeters => $composableBuilder(
+    column: $table.distanceFromPreviousMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get accepted => $composableBuilder(
+    column: $table.accepted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rejectionCode => $composableBuilder(
+    column: $table.rejectionCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RunningSessionsTableOrderingComposer get runningSessionLocalId {
+    final $$RunningSessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runningSessionLocalId,
+      referencedTable: $db.runningSessions,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunningSessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.runningSessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunningPointsTableAnnotationComposer
+    extends Composer<_$LocalDatabase, $RunningPointsTable> {
+  $$RunningPointsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get localId =>
+      $composableBuilder(column: $table.localId, builder: (column) => column);
+
+  GeneratedColumn<int> get sequenceNumber => $composableBuilder(
+    column: $table.sequenceNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<double> get altitude =>
+      $composableBuilder(column: $table.altitude, builder: (column) => column);
+
+  GeneratedColumn<double> get horizontalAccuracy => $composableBuilder(
+    column: $table.horizontalAccuracy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get verticalAccuracy => $composableBuilder(
+    column: $table.verticalAccuracy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get providerSpeed => $composableBuilder(
+    column: $table.providerSpeed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get speedAccuracy => $composableBuilder(
+    column: $table.speedAccuracy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get bearing =>
+      $composableBuilder(column: $table.bearing, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get elapsedRealtimeMs => $composableBuilder(
+    column: $table.elapsedRealtimeMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get distanceFromPreviousMeters => $composableBuilder(
+    column: $table.distanceFromPreviousMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get accepted =>
+      $composableBuilder(column: $table.accepted, builder: (column) => column);
+
+  GeneratedColumn<String> get rejectionCode => $composableBuilder(
+    column: $table.rejectionCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  $$RunningSessionsTableAnnotationComposer get runningSessionLocalId {
+    final $$RunningSessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runningSessionLocalId,
+      referencedTable: $db.runningSessions,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunningSessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.runningSessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunningPointsTableTableManager
+    extends
+        RootTableManager<
+          _$LocalDatabase,
+          $RunningPointsTable,
+          RunningPoint,
+          $$RunningPointsTableFilterComposer,
+          $$RunningPointsTableOrderingComposer,
+          $$RunningPointsTableAnnotationComposer,
+          $$RunningPointsTableCreateCompanionBuilder,
+          $$RunningPointsTableUpdateCompanionBuilder,
+          (RunningPoint, $$RunningPointsTableReferences),
+          RunningPoint,
+          PrefetchHooks Function({bool runningSessionLocalId})
+        > {
+  $$RunningPointsTableTableManager(
+    _$LocalDatabase db,
+    $RunningPointsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RunningPointsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RunningPointsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RunningPointsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> localId = const Value.absent(),
+                Value<String> runningSessionLocalId = const Value.absent(),
+                Value<int> sequenceNumber = const Value.absent(),
+                Value<double> latitude = const Value.absent(),
+                Value<double> longitude = const Value.absent(),
+                Value<double?> altitude = const Value.absent(),
+                Value<double> horizontalAccuracy = const Value.absent(),
+                Value<double?> verticalAccuracy = const Value.absent(),
+                Value<double?> providerSpeed = const Value.absent(),
+                Value<double?> speedAccuracy = const Value.absent(),
+                Value<double?> bearing = const Value.absent(),
+                Value<DateTime> recordedAt = const Value.absent(),
+                Value<int?> elapsedRealtimeMs = const Value.absent(),
+                Value<double> distanceFromPreviousMeters = const Value.absent(),
+                Value<bool> accepted = const Value.absent(),
+                Value<String?> rejectionCode = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RunningPointsCompanion(
+                localId: localId,
+                runningSessionLocalId: runningSessionLocalId,
+                sequenceNumber: sequenceNumber,
+                latitude: latitude,
+                longitude: longitude,
+                altitude: altitude,
+                horizontalAccuracy: horizontalAccuracy,
+                verticalAccuracy: verticalAccuracy,
+                providerSpeed: providerSpeed,
+                speedAccuracy: speedAccuracy,
+                bearing: bearing,
+                recordedAt: recordedAt,
+                elapsedRealtimeMs: elapsedRealtimeMs,
+                distanceFromPreviousMeters: distanceFromPreviousMeters,
+                accepted: accepted,
+                rejectionCode: rejectionCode,
+                createdAt: createdAt,
+                syncStatus: syncStatus,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String localId,
+                required String runningSessionLocalId,
+                required int sequenceNumber,
+                required double latitude,
+                required double longitude,
+                Value<double?> altitude = const Value.absent(),
+                required double horizontalAccuracy,
+                Value<double?> verticalAccuracy = const Value.absent(),
+                Value<double?> providerSpeed = const Value.absent(),
+                Value<double?> speedAccuracy = const Value.absent(),
+                Value<double?> bearing = const Value.absent(),
+                required DateTime recordedAt,
+                Value<int?> elapsedRealtimeMs = const Value.absent(),
+                Value<double> distanceFromPreviousMeters = const Value.absent(),
+                required bool accepted,
+                Value<String?> rejectionCode = const Value.absent(),
+                required DateTime createdAt,
+                Value<String> syncStatus = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RunningPointsCompanion.insert(
+                localId: localId,
+                runningSessionLocalId: runningSessionLocalId,
+                sequenceNumber: sequenceNumber,
+                latitude: latitude,
+                longitude: longitude,
+                altitude: altitude,
+                horizontalAccuracy: horizontalAccuracy,
+                verticalAccuracy: verticalAccuracy,
+                providerSpeed: providerSpeed,
+                speedAccuracy: speedAccuracy,
+                bearing: bearing,
+                recordedAt: recordedAt,
+                elapsedRealtimeMs: elapsedRealtimeMs,
+                distanceFromPreviousMeters: distanceFromPreviousMeters,
+                accepted: accepted,
+                rejectionCode: rejectionCode,
+                createdAt: createdAt,
+                syncStatus: syncStatus,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RunningPointsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({runningSessionLocalId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (runningSessionLocalId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.runningSessionLocalId,
+                                referencedTable: $$RunningPointsTableReferences
+                                    ._runningSessionLocalIdTable(db),
+                                referencedColumn: $$RunningPointsTableReferences
+                                    ._runningSessionLocalIdTable(db)
+                                    .localId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RunningPointsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LocalDatabase,
+      $RunningPointsTable,
+      RunningPoint,
+      $$RunningPointsTableFilterComposer,
+      $$RunningPointsTableOrderingComposer,
+      $$RunningPointsTableAnnotationComposer,
+      $$RunningPointsTableCreateCompanionBuilder,
+      $$RunningPointsTableUpdateCompanionBuilder,
+      (RunningPoint, $$RunningPointsTableReferences),
+      RunningPoint,
+      PrefetchHooks Function({bool runningSessionLocalId})
+    >;
 
 class $LocalDatabaseManager {
   final _$LocalDatabase _db;
@@ -4670,4 +8289,8 @@ class $LocalDatabaseManager {
       $$RepEventsTableTableManager(_db, _db.repEvents);
   $$SyncQueueItemsTableTableManager get syncQueueItems =>
       $$SyncQueueItemsTableTableManager(_db, _db.syncQueueItems);
+  $$RunningSessionsTableTableManager get runningSessions =>
+      $$RunningSessionsTableTableManager(_db, _db.runningSessions);
+  $$RunningPointsTableTableManager get runningPoints =>
+      $$RunningPointsTableTableManager(_db, _db.runningPoints);
 }
