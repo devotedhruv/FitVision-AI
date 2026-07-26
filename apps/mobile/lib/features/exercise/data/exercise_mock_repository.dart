@@ -1,4 +1,6 @@
 import 'package:fitvision_ai/core/constants/app_constants.dart';
+import 'package:fitvision_ai/core/errors/app_exception.dart';
+import 'package:fitvision_ai/core/errors/failure.dart';
 import 'package:fitvision_ai/features/exercise/models/exercise.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fitvision_ai/core/network/api_client.dart';
@@ -182,7 +184,9 @@ class ExerciseApiRepository implements ExerciseRepository {
       difficulty: ExerciseDifficulty.beginner,
       description: json['description'] as String,
       instructions: rawInstructions
-          .map((item) => (item as Map<String, dynamic>)['step'] as String? ?? '')
+          .map(
+            (item) => (item as Map<String, dynamic>)['step'] as String? ?? '',
+          )
           .where((item) => item.isNotEmpty)
           .toList(),
       targetMuscles: const [],
@@ -210,6 +214,40 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>(
   (ref) => ExerciseApiRepository(ref.watch(apiClientProvider)),
 );
 
-final exerciseCatalogueProvider = FutureProvider<List<Exercise>>(
-  (ref) => ref.watch(exerciseRepositoryProvider).fetchExercises(),
-);
+class ExerciseOfflineStatus extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setOffline(bool value) => state = value;
+}
+
+final exerciseOfflineStatusProvider =
+    NotifierProvider<ExerciseOfflineStatus, bool>(ExerciseOfflineStatus.new);
+
+final exerciseCatalogueProvider = FutureProvider<List<Exercise>>((ref) async {
+  try {
+    final items = await ref.watch(exerciseRepositoryProvider).fetchExercises();
+    ref.read(exerciseOfflineStatusProvider.notifier).setOffline(false);
+    return items;
+  } on AppException catch (error) {
+    if (error.failure is! NetworkFailure &&
+        error.failure is! TimeoutFailure &&
+        error.failure is! ServerFailure) {
+      rethrow;
+    }
+    ref.read(exerciseOfflineStatusProvider.notifier).setOffline(true);
+    return ExerciseMockRepository.exercises;
+  }
+});
+
+final exerciseByIdProvider = FutureProvider.family<Exercise?, String>((
+  ref,
+  exerciseId,
+) async {
+  if (exerciseId.trim().isEmpty) return null;
+  final catalogue = await ref.watch(exerciseCatalogueProvider.future);
+  for (final exercise in catalogue) {
+    if (exercise.id == exerciseId) return exercise;
+  }
+  return null;
+});

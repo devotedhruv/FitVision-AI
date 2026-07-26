@@ -10,7 +10,9 @@ class RegisterUser {
       throw const FormatException('Enter a valid email address.');
     }
     if (password.length < 8) {
-      throw const FormatException('Password must contain at least 8 characters.');
+      throw const FormatException(
+        'Password must contain at least 8 characters.',
+      );
     }
     return repository.register(email: email.trim(), password: password);
   }

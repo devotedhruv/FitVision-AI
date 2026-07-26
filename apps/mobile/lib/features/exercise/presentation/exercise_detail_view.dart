@@ -66,12 +66,13 @@ class ExerciseDetailView extends StatelessWidget {
             ),
             title: Text(
               exercise.supportsPoseDemo
-                  ? 'Simulated pose tracking available'
+                  ? 'On-device pose tracking available'
                   : 'Manual demo session',
             ),
             subtitle: Text(
               exercise.supportsPoseDemo
-                  ? 'No real camera analysis occurs in Phase 2.'
+                  ? 'Camera frames stay on your phone. Phase 4 detects body '
+                        'landmarks but does not count reps or score form.'
                   : 'Automated tracking is not supported for this exercise yet.',
             ),
           ),
@@ -79,7 +80,7 @@ class ExerciseDetailView extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
           label: exercise.supportsPoseDemo
-              ? 'Start Exercise Demo'
+              ? 'Open Camera Guide'
               : 'Start Manual Demo',
           icon: Icons.play_arrow,
           onPressed: () => context.push('/exercises/${exercise.id}/live'),

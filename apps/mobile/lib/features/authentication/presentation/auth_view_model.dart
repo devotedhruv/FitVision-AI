@@ -102,8 +102,10 @@ class _TestFallbackAuthRepository implements AuthRepository {
   @override
   AuthUser? get currentUser => user;
   @override
-  Future<AuthUser> login({required String email, required String password}) async =>
-      user;
+  Future<AuthUser> login({
+    required String email,
+    required String password,
+  }) async => user;
   @override
   Future<void> logout() async {}
   @override

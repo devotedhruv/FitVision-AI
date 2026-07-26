@@ -1,4 +1,5 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
+import 'package:fitvision_ai/core/errors/app_exception.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +16,50 @@ class ProfileView extends ConsumerWidget {
       appBar: AppBar(title: const Text('Profile')),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => Center(
-          child: FilledButton(
-            onPressed: () => ref.invalidate(currentProfileProvider),
-            child: const Text('Retry profile'),
+        error: (error, _) => Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off_outlined, size: 56),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  error is AppException
+                      ? error.failure.message
+                      : 'Profile could not be loaded.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                FilledButton(
+                  onPressed: () => ref.invalidate(currentProfileProvider),
+                  child: const Text('Retry profile'),
+                ),
+                TextButton(
+                  onPressed: () => context.push('/settings'),
+                  child: const Text('Open settings'),
+                ),
+                TextButton(
+                  onPressed: () => ref.read(authViewModelProvider).logout(),
+                  child: const Text('Sign out'),
+                ),
+              ],
+            ),
           ),
         ),
         data: (value) => ListView(
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [
+            if (value.isCached)
+              const Card(
+                child: ListTile(
+                  leading: Icon(Icons.offline_bolt_outlined),
+                  title: Text('Offline profile'),
+                  subtitle: Text(
+                    'Showing the last profile loaded from FitVision API.',
+                  ),
+                ),
+              ),
             CircleAvatar(
               radius: 42,
               child: Text(value.displayName.substring(0, 1).toUpperCase()),
@@ -48,6 +84,11 @@ class ProfileView extends ConsumerWidget {
               leading: const Icon(Icons.analytics_outlined),
               title: const Text('View analytics'),
               onTap: () => context.push('/analytics'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Settings'),
+              onTap: () => context.push('/settings'),
             ),
             ListTile(
               leading: const Icon(Icons.logout),

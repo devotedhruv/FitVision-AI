@@ -30,6 +30,7 @@ class _ExerciseListViewState extends ConsumerState<ExerciseListView> {
   @override
   Widget build(BuildContext context) {
     final catalogue = ref.watch(exerciseCatalogueProvider);
+    final isOffline = ref.watch(exerciseOfflineStatusProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Exercises')),
       body: catalogue.when(
@@ -54,6 +55,19 @@ class _ExerciseListViewState extends ConsumerState<ExerciseListView> {
               key: const Key('exercise-list'),
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
+                if (isOffline) ...[
+                  const Card(
+                    child: ListTile(
+                      leading: Icon(Icons.cloud_off_outlined),
+                      title: Text('Bundled offline catalogue'),
+                      subtitle: Text(
+                        'The FitVision API is unavailable. Camera exercises '
+                        'remain usable with the bundled Phase 4 definitions.',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 Text(
                   'Find your next movement',
                   style: AppTypography.pageTitle(context),

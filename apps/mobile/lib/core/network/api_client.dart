@@ -11,15 +11,17 @@ class ApiClient {
     String? Function()? accessTokenProvider,
     Dio? dio,
   }) : _accessTokenProvider = accessTokenProvider ?? (() => null),
-       _dio = dio ?? Dio(
-        BaseOptions(
-          baseUrl: config.apiBaseUrl.toString(),
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          responseType: ResponseType.json,
-          headers: const {'Accept': 'application/json'},
-        ),
-       ) {
+       _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               baseUrl: config.apiBaseUrl.toString(),
+               connectTimeout: const Duration(seconds: 10),
+               receiveTimeout: const Duration(seconds: 10),
+               responseType: ResponseType.json,
+               headers: const {'Accept': 'application/json'},
+             ),
+           ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -58,7 +60,9 @@ class ApiClient {
       final response = await _dio.get<Object?>(path);
       final data = response.data;
       if (data is! List) throw const AppException(ServerFailure());
-      return data.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+      return data
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList();
     } on AppException {
       rethrow;
     } on DioException catch (error) {

@@ -1,0 +1,8 @@
+class PoseException implements Exception {
+  const PoseException(this.code, this.message);
+  final String code;
+  final String message;
+
+  @override
+  String toString() => 'PoseException($code): $message';
+}

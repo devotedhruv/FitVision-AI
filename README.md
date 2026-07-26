@@ -6,7 +6,11 @@ FitVision AI is an Android-first mobile-system project for future on-device exer
 
 The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
 
-> **Current status: Phase 1 implementation is complete and its Flutter/FastAPI tests and static checks pass. Final Android APK validation remains blocked by an incomplete Android command-line-tools installation and a Gradle compile stall.**
+> **Current status:** Phase 4 Android CameraX/MediaPipe pose-foundation
+> implementation is present. Flutter/native tests and the configured debug APK
+> build pass. A vivo physical run verified front preview and live landmark
+> overlay; the complete permission/lifecycle/performance/ten-minute acceptance
+> run remains pending and is documented in the Phase 4 validation report.
 
 The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
 
@@ -46,7 +50,11 @@ Camera frames are processed on the device. Flutter use cases coordinate the nati
 1. **Phase 0 — Planning and requirement analysis (complete):** scope, traceable requirements, acceptance baseline, risks, and diagrams. At this milestone, application implementation had not started.
 2. **Phase 1 — Project foundation (validation pending):** Flutter and FastAPI foundations, environment configuration, health contract, tests, and analysis are complete; debug APK validation remains unresolved.
 3. **Phase 2 — UI/UX, design system, application navigation and mock-data screens:** begins only after Phase 1 mobile acceptance checks pass.
-4. **Later implementation phases:** camera/native pose integration, exercise rules, running, authentication/data, history/analytics, validation, and delivery remain subject to the Phase 0 requirements and future phase plans.
+4. **Phase 4 — camera and pose foundation:** native CameraX preview, on-device
+   MediaPipe Pose Landmarker, Flutter skeleton, placement guidance, countdown
+   and lifecycle-safe controls.
+5. **Later phases:** exercise rules/rep counting, real GPS running, advanced
+   analytics, validation and delivery.
 
 Roadmap phases after Phase 0 are planning guidance and may change through controlled review.
 
@@ -122,6 +130,33 @@ flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://
 
 For a physical device, first run `adb reverse tcp:8000 tcp:8000`, then use `API_BASE_URL=http://127.0.0.1:8000`. Local cleartext traffic is enabled only by the Android debug manifest; production configuration requires HTTPS.
 
+### Phase 4 camera run
+
+The Android app requests camera permission only after the user opens an
+exercise camera guide and presses **Enable camera**. It never requests
+microphone, storage or location permission in Phase 4.
+
+```bash
+cd apps/mobile
+adb reverse tcp:8000 tcp:8000
+flutter run -d YOUR_DEVICE_ID \
+  --dart-define=APP_ENV=development \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8000 \
+  --dart-define=SUPABASE_URL=https://PROJECT.supabase.co \
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=PUBLIC_KEY
+```
+
+The official `pose_landmarker_lite.task` model is checked in under
+`packages/pose_landmarker/android/src/main/assets/`. Its source and checksum
+are recorded in
+[`model-provenance.md`](docs/phases/phase-04-camera-pose-foundation/model-provenance.md).
+Debug builds show landmark indices, processed FPS and inference latency; release
+builds suppress debug data.
+
+Camera frames and raw video stay on-device and are neither uploaded nor saved
+by default. Phase 4 detects landmarks only: rep counting, UP/DOWN/HOLD stages,
+joint angles and form scoring remain Phase 5 work.
+
 ## Phase 0 Documentation
 
 - [Problem statement](docs/phases/phase-00-planning/problem-statement.md)
@@ -171,6 +206,10 @@ This project is intended for a four-person development team. The proposal presen
   end-to-end authentication or database migration validation.
 - Workout, running, and analytics mobile screens remain mock/empty experiences;
   Phase 3 supplies storage APIs but does not implement sensing or synchronization.
+- Running remains a clearly marked preview: Phase 4 adds no location
+  permission, real GPS or live route.
+- Pose inference is Android-only. Physical performance varies by device; consult
+  the Phase 4 performance report before claiming FPS/latency targets.
 - Thresholds, model performance, supported Android versions/devices, GPS filters, maps provider, and sync conflict details require Phase 1 decisions and empirical validation.
 - Only one user in supported views/conditions is planned for pose monitoring.
 - Automated cues may be wrong when landmarks are uncertain and are not a substitute for a qualified professional.
@@ -186,7 +225,8 @@ models, Alembic migrations, RLS policies, and core user-scoped APIs. See
 [`docs/phases/phase-03-auth-backend-database/`](docs/phases/phase-03-auth-backend-database/)
 for setup, security, schema, API, and validation details.
 
-The next phase is **Phase 4 — Camera integration and on-device MediaPipe Pose
-Landmarker.** Its first task should establish the typed Flutter-to-Kotlin camera
-and landmark boundary with lifecycle, permission, and performance tests before
-adding exercise state machines.
+The next phase is **Phase 5 — deterministic exercise analysis**. Its first task
+should consume the existing `ExerciseAnalysisState` boundary and implement a
+well-tested squat state machine from stable, visibility-gated landmarks before
+adding curls or push-ups. Camera code must remain independent of exercise
+rules.

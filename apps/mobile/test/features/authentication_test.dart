@@ -18,8 +18,10 @@ import 'package:fitvision_ai/features/authentication/domain/use_cases/register_u
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/exercise/data/exercise_mock_repository.dart';
 import 'package:fitvision_ai/features/profile/models/profile.dart';
+import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FakeAuthRepository implements AuthRepository {
   final controller = StreamController<AuthUser?>.broadcast();
@@ -34,7 +36,10 @@ class FakeAuthRepository implements AuthRepository {
   @override
   AuthUser? get currentUser => user;
   @override
-  Future<AuthUser> login({required String email, required String password}) async {
+  Future<AuthUser> login({
+    required String email,
+    required String password,
+  }) async {
     return user = AuthUser(id: '1', email: email, emailVerified: true);
   }
 
@@ -83,19 +88,22 @@ AppConfig get config => AppConfig(
 );
 
 void main() {
-  test('login and registration validate input before repository calls', () async {
-    final repository = FakeAuthRepository();
-    expect(
-      () => LoginUser(repository)('invalid', 'password'),
-      throwsFormatException,
-    );
-    expect(
-      () => RegisterUser(repository)('user@example.test', 'short'),
-      throwsFormatException,
-    );
-    final user = await LoginUser(repository)('user@example.test', 'password');
-    expect(user.email, 'user@example.test');
-  });
+  test(
+    'login and registration validate input before repository calls',
+    () async {
+      final repository = FakeAuthRepository();
+      expect(
+        () => LoginUser(repository)('invalid', 'password'),
+        throwsFormatException,
+      );
+      expect(
+        () => RegisterUser(repository)('user@example.test', 'short'),
+        throwsFormatException,
+      );
+      final user = await LoginUser(repository)('user@example.test', 'password');
+      expect(user.email, 'user@example.test');
+    },
+  );
 
   test('logout delegates to auth repository', () async {
     final repository = FakeAuthRepository();
@@ -107,25 +115,28 @@ void main() {
     expect(config.hasSupabaseConfiguration, isFalse);
   });
 
-  test('API attaches bearer token when present and omits it when absent', () async {
-    final withToken = RecordingAdapter(status: 200, body: {'ok': true});
-    await ApiClient(
-      config,
-      accessTokenProvider: () => 'test-access-token',
-      dio: Dio()..httpClientAdapter = withToken,
-    ).getJson('/resource');
-    expect(
-      withToken.request?.headers['Authorization'],
-      'Bearer test-access-token',
-    );
+  test(
+    'API attaches bearer token when present and omits it when absent',
+    () async {
+      final withToken = RecordingAdapter(status: 200, body: {'ok': true});
+      await ApiClient(
+        config,
+        accessTokenProvider: () => 'test-access-token',
+        dio: Dio()..httpClientAdapter = withToken,
+      ).getJson('/resource');
+      expect(
+        withToken.request?.headers['Authorization'],
+        'Bearer test-access-token',
+      );
 
-    final withoutToken = RecordingAdapter(status: 200, body: {'ok': true});
-    await ApiClient(
-      config,
-      dio: Dio()..httpClientAdapter = withoutToken,
-    ).getJson('/resource');
-    expect(withoutToken.request?.headers['Authorization'], isNull);
-  });
+      final withoutToken = RecordingAdapter(status: 200, body: {'ok': true});
+      await ApiClient(
+        config,
+        dio: Dio()..httpClientAdapter = withoutToken,
+      ).getJson('/resource');
+      expect(withoutToken.request?.headers['Authorization'], isNull);
+    },
+  );
 
   test('API maps HTTP 401 to unauthorized failure', () async {
     final adapter = RecordingAdapter(status: 401, body: {'error': 'invalid'});
@@ -148,6 +159,39 @@ void main() {
     expect(profile.displayName, 'Alex');
     expect(profile.preferredUnits, 'metric');
   });
+
+  test(
+    'profile falls back to the last API-backed cache when offline',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final online = RecordingAdapter(
+        status: 200,
+        body: {
+          'id': 'profile-id',
+          'display_name': 'Alex',
+          'avatar_url': null,
+          'preferred_units': 'metric',
+        },
+      );
+      final onlineRepository = ProfileRepository(
+        ApiClient(config, dio: Dio()..httpClientAdapter = online),
+      );
+      final loaded = await onlineRepository.getMe();
+      expect(loaded.isCached, isFalse);
+
+      final unavailable = RecordingAdapter(
+        status: 500,
+        body: {'error': 'down'},
+      );
+      final offlineRepository = ProfileRepository(
+        ApiClient(config, dio: Dio()..httpClientAdapter = unavailable),
+      );
+      final cached = await offlineRepository.getMe();
+
+      expect(cached.displayName, 'Alex');
+      expect(cached.isCached, isTrue);
+    },
+  );
 
   test('exercise API response maps into Phase 2 exercise model', () async {
     final adapter = RecordingAdapter(
@@ -187,4 +231,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Welcome back to FitVision AI'), findsOneWidget);
   });
+
+  testWidgets(
+    'authenticated users are redirected from login and registration',
+    (tester) async {
+      final repository = FakeAuthRepository()
+        ..user = const AuthUser(
+          id: 'authenticated-user',
+          email: 'user@example.test',
+          emailVerified: true,
+        );
+      addTearDown(repository.controller.close);
+      appRouter.go('/auth/login');
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appConfigProvider.overrideWithValue(config),
+            authRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const FitVisionApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Home'), findsWidgets);
+
+      appRouter.go('/auth/register');
+      await tester.pumpAndSettle();
+      expect(find.text('Home'), findsWidgets);
+      expect(find.text('Create your account'), findsNothing);
+    },
+  );
 }

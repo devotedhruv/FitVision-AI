@@ -2,17 +2,28 @@ import 'package:fitvision_ai/app/app.dart';
 import 'package:fitvision_ai/app/router.dart';
 import 'package:fitvision_ai/core/config/app_config.dart';
 import 'package:fitvision_ai/core/config/app_environment.dart';
+import 'package:fitvision_ai/core/errors/app_exception.dart';
+import 'package:fitvision_ai/core/errors/failure.dart';
 import 'package:fitvision_ai/features/dashboard/data/dashboard_mock_repository.dart';
 import 'package:fitvision_ai/features/exercise/data/exercise_mock_repository.dart';
+import 'package:fitvision_ai/features/exercise/models/exercise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+class OfflineExerciseRepository implements ExerciseRepository {
+  const OfflineExerciseRepository();
+
+  @override
+  Future<List<Exercise>> fetchExercises() =>
+      Future.error(const AppException(NetworkFailure()));
+}
 
 void main() {
   Future<void> pumpApp(
     WidgetTester tester, {
     DashboardMockRepository dashboard = const DashboardMockRepository(),
-    ExerciseMockRepository exercises = const ExerciseMockRepository(),
+    ExerciseRepository exercises = const ExerciseMockRepository(),
     bool settle = true,
   }) async {
     appRouter.go('/dashboard');
@@ -73,8 +84,8 @@ void main() {
     await pumpApp(tester);
     await tester.tap(find.text('Running').last);
     await tester.pumpAndSettle();
-    expect(find.text('GPS MAP PLACEHOLDER'), findsOneWidget);
-    expect(appRouter.routeInformationProvider.value.uri.path, '/running');
+    expect(find.text('Running setup'), findsOneWidget);
+    expect(appRouter.routeInformationProvider.value.uri.path, '/running/setup');
   });
 
   testWidgets('dashboard start action opens exercise list', (tester) async {
@@ -113,8 +124,8 @@ void main() {
     await tester.tap(find.text('Squat').first);
     await tester.pumpAndSettle();
     expect(find.text('How to perform'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Start Exercise Demo'), 300);
-    expect(find.text('Start Exercise Demo'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Open Camera Guide'), 300);
+    expect(find.text('Open Camera Guide'), findsOneWidget);
   });
 
   testWidgets('invalid exercise id has safe recovery UI', (tester) async {
@@ -123,6 +134,39 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Exercise not found'), findsOneWidget);
     expect(find.text('Browse exercises'), findsOneWidget);
+  });
+
+  testWidgets('detail route resolves the configured repository catalogue', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      exercises: const ExerciseMockRepository(mode: MockDataMode.empty),
+    );
+
+    appRouter.go('/exercises/squat');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Exercise not found'), findsOneWidget);
+    expect(find.text('How to perform'), findsNothing);
+  });
+
+  testWidgets('detail route exposes repository loading and error states', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      exercises: const ExerciseMockRepository(mode: MockDataMode.error),
+      settle: false,
+    );
+    appRouter.go('/exercises/squat');
+    await tester.pump();
+    expect(find.bySemanticsLabel('Loading exercise details'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    expect(find.text('Exercise unavailable'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
   });
 
   testWidgets('empty catalogue renders explicit state', (tester) async {
@@ -143,5 +187,17 @@ void main() {
     appRouter.go('/exercises');
     await tester.pumpAndSettle();
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets('network failure uses a clearly labelled offline catalogue', (
+    tester,
+  ) async {
+    await pumpApp(tester, exercises: const OfflineExerciseRepository());
+    appRouter.go('/exercises');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bundled offline catalogue'), findsOneWidget);
+    expect(find.text('Squat'), findsOneWidget);
+    expect(find.text('Retry'), findsNothing);
   });
 }
