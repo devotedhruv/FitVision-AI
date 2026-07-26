@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fitvision_ai/core/storage/local_database.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
+import 'package:fitvision_ai/features/exercise/presentation/exercise_tutorial_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
@@ -88,6 +89,17 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             'Pose inference runs on-device. Raw camera video is not uploaded '
             'or saved by default.',
           ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.school_outlined),
+          title: const Text('Reset exercise tutorials'),
+          subtitle: const Text(
+            'Show the animated preparation guide again before every exercise.',
+          ),
+          onTap: () async {
+            await ExerciseTutorialPreferences.resetAll();
+            _message('Exercise tutorials reset.');
+          },
         ),
         ListTile(
           leading: const Icon(Icons.delete_forever_outlined),

@@ -33,11 +33,13 @@ class ProfileRepository {
   Future<UserProfile> update({
     String? displayName,
     String? preferredUnits,
+    Map<String, dynamic> fields = const {},
   }) async {
     final profile = UserProfile.fromJson(
       await client.patchJson('/api/v1/users/me', {
         'display_name': ?displayName,
         'preferred_units': ?preferredUnits,
+        ...fields,
       }),
     );
     await _cache(profile);

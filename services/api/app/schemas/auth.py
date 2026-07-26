@@ -11,6 +11,8 @@ class CurrentUserClaims(BaseModel):
     email: EmailStr | None = None
     role: str = Field(default="authenticated", max_length=80)
     expires_at: datetime
+    identity_provider: str = "supabase"
+    provider_subject: str | None = None
 
     @field_validator("expires_at")
     @classmethod

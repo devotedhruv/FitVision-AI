@@ -1,4 +1,5 @@
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/authentication/presentation/social_auth_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ class LoginView extends ConsumerStatefulWidget {
 class _LoginViewState extends ConsumerState<LoginView> {
   final email = TextEditingController();
   final password = TextEditingController();
+  bool obscurePassword = true;
 
   @override
   void dispose() {
@@ -35,14 +37,26 @@ class _LoginViewState extends ConsumerState<LoginView> {
             key: const Key('login-email'),
             controller: email,
             keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
             decoration: const InputDecoration(labelText: 'Email'),
           ),
           const SizedBox(height: 12),
           TextField(
             key: const Key('login-password'),
             controller: password,
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Password'),
+            obscureText: obscurePassword,
+            autofillHints: const [AutofillHints.password],
+            decoration: InputDecoration(
+              labelText: 'Password',
+              suffixIcon: IconButton(
+                tooltip: obscurePassword ? 'Show password' : 'Hide password',
+                onPressed: () =>
+                    setState(() => obscurePassword = !obscurePassword),
+                icon: Icon(
+                  obscurePassword ? Icons.visibility : Icons.visibility_off,
+                ),
+              ),
+            ),
           ),
           if (auth.errorMessage != null)
             Padding(
@@ -60,8 +74,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 : () => auth.login(email.text, password.text),
             child: const Text('Sign in'),
           ),
+          const SizedBox(height: 16),
+          const SocialAuthButtons(),
           TextButton(
-            onPressed: () => context.go('/register'),
+            onPressed: () => context.go('/auth/forgot-password'),
+            child: const Text('Forgot password?'),
+          ),
+          TextButton(
+            onPressed: () => context.go('/auth/register'),
             child: const Text('Create an account'),
           ),
         ],

@@ -7,7 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AuthenticationError
-from app.core.security import SupabaseJWTVerifier
+from app.core.security import ClerkJWTVerifier, SupabaseJWTVerifier
 from app.db.session import get_db_session
 from app.schemas.auth import CurrentUserClaims
 
@@ -27,10 +27,15 @@ def get_pagination(
     return Pagination(limit=limit, offset=offset)
 
 
-def get_jwt_verifier(request: Request) -> SupabaseJWTVerifier:
+def get_jwt_verifier(request: Request) -> ClerkJWTVerifier | SupabaseJWTVerifier:
     verifier = getattr(request.app.state, "jwt_verifier", None)
     if verifier is None:
-        verifier = SupabaseJWTVerifier(request.app.state.settings)
+        settings = request.app.state.settings
+        verifier = (
+            ClerkJWTVerifier(settings)
+            if settings.AUTH_PROVIDER == "clerk"
+            else SupabaseJWTVerifier(settings)
+        )
         request.app.state.jwt_verifier = verifier
     return verifier
 

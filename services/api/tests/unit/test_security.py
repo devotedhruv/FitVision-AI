@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 from app.core.config import Settings
 from app.core.exceptions import AuthenticationError
-from app.core.security import SupabaseJWTVerifier
+from app.core.security import ClerkJWTVerifier, SupabaseJWTVerifier
 
 ISSUER = "https://project.supabase.co/auth/v1"
 AUDIENCE = "authenticated"
@@ -101,3 +101,58 @@ async def test_malformed_and_unsupported_tokens_are_rejected(settings, keys):
     )
     with pytest.raises(AuthenticationError):
         await verifier.verify(unsupported)
+
+
+@pytest.fixture
+def clerk_settings():
+    return Settings(
+        APP_ENV="testing",
+        AUTH_PROVIDER="clerk",
+        CLERK_ISSUER="https://fitvision.clerk.accounts.dev",
+        CLERK_AUDIENCE="fitvision-api",
+        CLERK_AUTHORIZED_PARTIES=["fitvision://mobile"],
+    )
+
+
+def clerk_token(private_key, **overrides) -> str:
+    now = datetime.now(UTC)
+    payload = {
+        "sub": "user_fitvision_test",
+        "iss": "https://fitvision.clerk.accounts.dev",
+        "aud": "fitvision-api",
+        "azp": "fitvision://mobile",
+        "iat": now,
+        "nbf": now - timedelta(seconds=1),
+        "exp": now + timedelta(minutes=10),
+    }
+    payload.update(overrides)
+    return jwt.encode(payload, private_key, algorithm="RS256", headers={"kid": "clerk-key"})
+
+
+@pytest.mark.asyncio
+async def test_valid_clerk_token_is_accepted(clerk_settings, keys):
+    private, public, _ = keys
+    claims = await ClerkJWTVerifier(
+        clerk_settings, StaticKeyProvider(public)
+    ).verify(clerk_token(private))
+    assert claims.identity_provider == "clerk"
+    assert claims.provider_subject == "user_fitvision_test"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"exp": datetime.now(UTC) - timedelta(seconds=1)},
+        {"nbf": datetime.now(UTC) + timedelta(minutes=2)},
+        {"iss": "https://wrong.clerk.accounts.dev"},
+        {"aud": "wrong-api"},
+        {"azp": "https://untrusted.example"},
+    ],
+)
+async def test_invalid_clerk_claims_are_rejected(clerk_settings, keys, overrides):
+    private, public, _ = keys
+    with pytest.raises(AuthenticationError):
+        await ClerkJWTVerifier(clerk_settings, StaticKeyProvider(public)).verify(
+            clerk_token(private, **overrides)
+        )

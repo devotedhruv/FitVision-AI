@@ -1,6 +1,8 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
 import 'package:fitvision_ai/core/design_system/app_typography.dart';
 import 'package:fitvision_ai/features/exercise/models/exercise.dart';
+import 'package:fitvision_ai/features/exercise/presentation/exercise_tutorial_view.dart';
+import 'package:fitvision_ai/features/exercise/presentation/widgets/exercise_animation.dart';
 import 'package:fitvision_ai/shared/widgets/error_view.dart';
 import 'package:fitvision_ai/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -16,24 +18,9 @@ class ExerciseDetailView extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
-        Container(
+        SizedBox(
           height: 210,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primaryContainer,
-                Theme.of(context).colorScheme.secondaryContainer,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(AppRadius.extraLarge),
-          ),
-          child: Icon(
-            Icons.fitness_center,
-            size: 88,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
+          child: ExerciseAnimation(exerciseId: exercise.id),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(exercise.name, style: AppTypography.pageTitle(context)),
@@ -102,7 +89,12 @@ class ExerciseDetailView extends StatelessWidget {
               : 'Start Manual Demo',
           icon: Icons.play_arrow,
           expand: true,
-          onPressed: () => context.push('/exercises/${exercise.id}/live'),
+          onPressed: () async {
+            final ready = await showExerciseTutorial(context, exercise);
+            if (ready && context.mounted) {
+              context.push('/exercises/${exercise.id}/live');
+            }
+          },
         ),
       ],
     ),

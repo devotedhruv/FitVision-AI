@@ -9,9 +9,12 @@ import 'package:fitvision_ai/features/history/presentation/history_view.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
 import 'package:fitvision_ai/features/authentication/presentation/email_verification_view.dart';
 import 'package:fitvision_ai/features/authentication/presentation/login_view.dart';
+import 'package:fitvision_ai/features/authentication/presentation/password_recovery_view.dart';
 import 'package:fitvision_ai/features/authentication/presentation/register_view.dart';
 import 'package:fitvision_ai/features/onboarding/presentation/onboarding_view.dart';
 import 'package:fitvision_ai/features/profile/presentation/profile_view.dart';
+import 'package:fitvision_ai/features/profile/presentation/edit_profile_view.dart';
+import 'package:fitvision_ai/features/profile/models/profile.dart';
 import 'package:fitvision_ai/features/history/presentation/session_detail_view.dart';
 import 'package:fitvision_ai/features/running/presentation/running_setup_view.dart';
 import 'package:fitvision_ai/features/running/presentation/live_running_view.dart';
@@ -54,6 +57,7 @@ final GoRouter appRouter = GoRouter(
       '/auth/login',
       '/auth/register',
       '/auth/verify-email',
+      '/auth/forgot-password',
     }.contains(state.matchedLocation);
     if (state.matchedLocation == '/splash') {
       return switch (auth.status) {
@@ -197,6 +201,10 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterView(),
     ),
     GoRoute(
+      path: '/auth/forgot-password',
+      builder: (context, state) => const PasswordRecoveryView(),
+    ),
+    GoRoute(
       name: AppRouteNames.verifyEmail,
       path: '/auth/verify-email',
       builder: (context, state) => const EmailVerificationView(),
@@ -217,6 +225,13 @@ final GoRouter appRouter = GoRouter(
       name: AppRouteNames.settings,
       path: '/settings',
       builder: (context, state) => const SettingsView(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/profile/edit',
+      builder: (context, state) => state.extra is UserProfile
+          ? EditProfileView(profile: state.extra! as UserProfile)
+          : const ProfileView(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

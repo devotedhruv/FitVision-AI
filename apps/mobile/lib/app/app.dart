@@ -22,6 +22,10 @@ class _FitVisionAppState extends ConsumerState<FitVisionApp>
   void initState() {
     super.initState();
     auth = ref.read(authViewModelProvider);
+    assert(() {
+      debugPrint('FitVision auth repository: ${auth.repository.runtimeType}');
+      return true;
+    }());
     activeAuthViewModel = auth;
     auth.addListener(appRouter.refresh);
     WidgetsBinding.instance.addObserver(this);
@@ -39,6 +43,7 @@ class _FitVisionAppState extends ConsumerState<FitVisionApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      auth.refreshFromProvider();
       unawaited(ref.read(syncManagerProvider).synchronize());
     }
   }

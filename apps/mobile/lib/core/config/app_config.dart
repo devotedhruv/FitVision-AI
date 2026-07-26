@@ -7,6 +7,7 @@ class AppConfig {
     required this.apiBaseUrl,
     this.supabaseUrl = '',
     this.supabasePublishableKey = '',
+    this.clerkPublishableKey = '',
   });
 
   factory AppConfig.load() {
@@ -22,6 +23,7 @@ class AppConfig {
     const supabasePublishableKey = String.fromEnvironment(
       'SUPABASE_PUBLISHABLE_KEY',
     );
+    const clerkPublishableKey = String.fromEnvironment('CLERK_PUBLISHABLE_KEY');
     final environment = AppEnvironment.parse(environmentValue);
     final uri = Uri.tryParse(apiBaseUrl);
     if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
@@ -51,6 +53,7 @@ class AppConfig {
       apiBaseUrl: uri,
       supabaseUrl: supabaseUrl,
       supabasePublishableKey: supabasePublishableKey,
+      clerkPublishableKey: clerkPublishableKey,
     );
   }
 
@@ -58,9 +61,12 @@ class AppConfig {
   final Uri apiBaseUrl;
   final String supabaseUrl;
   final String supabasePublishableKey;
+  final String clerkPublishableKey;
 
   bool get hasSupabaseConfiguration =>
       supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
+
+  bool get hasClerkConfiguration => clerkPublishableKey.isNotEmpty;
 }
 
 final appConfigProvider = Provider<AppConfig>(

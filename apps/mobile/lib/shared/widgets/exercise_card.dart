@@ -1,5 +1,6 @@
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
 import 'package:fitvision_ai/features/exercise/models/exercise.dart';
+import 'package:fitvision_ai/features/exercise/presentation/widgets/exercise_animation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseCard extends StatelessWidget {
@@ -19,24 +20,12 @@ class ExerciseCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 width: 72,
                 height: 72,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primaryContainer,
-                      Theme.of(context).colorScheme.secondaryContainer,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(AppRadius.large),
-                ),
-                child: Icon(
-                  _iconFor(exercise.category),
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  size: 32,
+                child: ExerciseAnimation(
+                  exerciseId: exercise.id,
+                  compact: true,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -79,13 +68,6 @@ class ExerciseCard extends StatelessWidget {
       ),
     ),
   );
-
-  IconData _iconFor(ExerciseCategory category) => switch (category) {
-    ExerciseCategory.strength => Icons.fitness_center,
-    ExerciseCategory.mobility => Icons.accessibility_new,
-    ExerciseCategory.cardio => Icons.monitor_heart_outlined,
-    ExerciseCategory.core => Icons.self_improvement,
-  };
 }
 
 class _Meta extends StatelessWidget {

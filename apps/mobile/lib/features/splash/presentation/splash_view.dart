@@ -5,18 +5,12 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Scaffold(
-    body: SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.accessibility_new, size: 72),
-            SizedBox(height: 16),
-            Text('FitVision AI', style: TextStyle(fontSize: 28)),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
-          ],
-        ),
+    backgroundColor: Color(0xFF02050D),
+    body: SizedBox.expand(
+      child: Image(
+        image: AssetImage('assets/images/fitvision_splash.png'),
+        fit: BoxFit.cover,
+        semanticLabel: 'FitVision AI',
       ),
     ),
   );

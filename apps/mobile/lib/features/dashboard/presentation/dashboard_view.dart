@@ -1,4 +1,3 @@
-import 'package:fitvision_ai/core/constants/app_constants.dart';
 import 'package:fitvision_ai/core/design_system/app_icons.dart';
 import 'package:fitvision_ai/core/design_system/app_spacing.dart';
 import 'package:fitvision_ai/core/design_system/app_typography.dart';
@@ -6,6 +5,8 @@ import 'package:fitvision_ai/core/utils/date_time_formatter.dart';
 import 'package:fitvision_ai/features/dashboard/data/dashboard_mock_repository.dart';
 import 'package:fitvision_ai/features/dashboard/models/dashboard_summary.dart';
 import 'package:fitvision_ai/features/exercise/data/exercise_mock_repository.dart';
+import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:fitvision_ai/shared/widgets/error_view.dart';
 import 'package:fitvision_ai/shared/widgets/exercise_card.dart';
 import 'package:fitvision_ai/shared/widgets/loading_indicator.dart';
@@ -21,6 +22,12 @@ class DashboardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(dashboardSummaryProvider);
+    final profile = ref.watch(currentProfileProvider);
+    final authUser = ref.watch(authViewModelProvider).repository.currentUser;
+    final displayName = profile.asData?.value.displayName.trim();
+    final greetingName = displayName != null && displayName.isNotEmpty
+        ? displayName
+        : authUser?.resolvedDisplayName ?? 'Athlete';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -41,6 +48,7 @@ class DashboardView extends ConsumerWidget {
         ),
         data: (data) => _DashboardContent(
           summary: data,
+          displayName: greetingName,
           onRefresh: () async => ref.refresh(dashboardSummaryProvider.future),
         ),
       ),
@@ -49,8 +57,13 @@ class DashboardView extends ConsumerWidget {
 }
 
 class _DashboardContent extends StatelessWidget {
-  const _DashboardContent({required this.summary, required this.onRefresh});
+  const _DashboardContent({
+    required this.summary,
+    required this.displayName,
+    required this.onRefresh,
+  });
   final DashboardSummary summary;
+  final String displayName;
   final Future<void> Function() onRefresh;
 
   @override
@@ -71,7 +84,7 @@ class _DashboardContent extends StatelessWidget {
           Semantics(
             header: true,
             child: Text(
-              '$greeting, ${AppConstants.demoUserName}',
+              '$greeting, $displayName',
               style: AppTypography.pageTitle(context),
             ),
           ),

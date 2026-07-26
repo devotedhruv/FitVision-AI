@@ -6,6 +6,7 @@ import 'package:fitvision_ai/features/profile/data/profile_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fitvision_ai/features/profile/models/profile.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
@@ -13,6 +14,7 @@ class ProfileView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider);
+    final authUser = ref.watch(authViewModelProvider).repository.currentUser;
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: profile.when(
@@ -86,11 +88,43 @@ class ProfileView extends ConsumerWidget {
                             'FitVision member',
                             style: AppTypography.caption(context),
                           ),
+                          if (authUser?.email case final email?)
+                            Text(email, style: AppTypography.caption(context)),
                         ],
                       ),
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person_outline),
+                    title: const Text('Personal information'),
+                    subtitle: const Text('Name and account profile'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/profile/edit', extra: value),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.monitor_weight_outlined),
+                    title: const Text('Health profile'),
+                    subtitle: Text(_healthSummary(value)),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/profile/edit', extra: value),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.fitness_center),
+                    title: const Text('Fitness preferences'),
+                    subtitle: Text(
+                      value.fitnessLevel ?? 'Add your fitness level',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/profile/edit', extra: value),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -147,5 +181,15 @@ class ProfileView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static String _healthSummary(UserProfile profile) {
+    final parts = <String>[
+      if (profile.heightCm != null)
+        '${profile.heightCm!.toStringAsFixed(0)} cm',
+      if (profile.weightKg != null)
+        '${profile.weightKg!.toStringAsFixed(1)} kg',
+    ];
+    return parts.isEmpty ? 'Add height and weight' : parts.join(' • ');
   }
 }

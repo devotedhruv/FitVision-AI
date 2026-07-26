@@ -47,7 +47,7 @@ void main() {
 
   testWidgets('application starts on dashboard', (tester) async {
     await pumpApp(tester);
-    expect(find.textContaining('Alex'), findsOneWidget);
+    expect(find.textContaining('local'), findsOneWidget);
     expect(find.text('Start Workout'), findsOneWidget);
   });
 

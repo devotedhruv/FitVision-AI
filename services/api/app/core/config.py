@@ -42,6 +42,11 @@ class Settings(BaseSettings):
         "ES256",
         "RS256",
     ]
+    AUTH_PROVIDER: Literal["supabase", "clerk"] = "supabase"
+    CLERK_ISSUER: str | None = None
+    CLERK_JWKS_URL: str | None = None
+    CLERK_AUDIENCE: str | None = None
+    CLERK_AUTHORIZED_PARTIES: list[str] = []
     DB_POOL_SIZE: int = Field(default=5, ge=1, le=50)
     DB_MAX_OVERFLOW: int = Field(default=10, ge=0, le=100)
     DB_POOL_TIMEOUT: int = Field(default=30, ge=1, le=300)
@@ -111,14 +116,28 @@ class Settings(BaseSettings):
             self.SUPABASE_JWKS_URL = (
                 self.SUPABASE_JWKS_URL or f"{self.SUPABASE_URL}/auth/v1/.well-known/jwks.json"
             )
+        if self.CLERK_ISSUER:
+            self.CLERK_ISSUER = self.CLERK_ISSUER.rstrip("/")
+            self.CLERK_JWKS_URL = (
+                self.CLERK_JWKS_URL
+                or f"{self.CLERK_ISSUER}/.well-known/jwks.json"
+            )
         if self.APP_ENV == "production":
             required = {
                 "DATABASE_URL": self.DATABASE_URL,
-                "SUPABASE_URL": self.SUPABASE_URL,
-                "SUPABASE_PUBLISHABLE_KEY": self.SUPABASE_PUBLISHABLE_KEY,
-                "SUPABASE_JWT_ISSUER": self.SUPABASE_JWT_ISSUER,
-                "SUPABASE_JWKS_URL": self.SUPABASE_JWKS_URL,
             }
+            if self.AUTH_PROVIDER == "clerk":
+                required.update(
+                    CLERK_ISSUER=self.CLERK_ISSUER,
+                    CLERK_JWKS_URL=self.CLERK_JWKS_URL,
+                )
+            else:
+                required.update(
+                    SUPABASE_URL=self.SUPABASE_URL,
+                    SUPABASE_PUBLISHABLE_KEY=self.SUPABASE_PUBLISHABLE_KEY,
+                    SUPABASE_JWT_ISSUER=self.SUPABASE_JWT_ISSUER,
+                    SUPABASE_JWKS_URL=self.SUPABASE_JWKS_URL,
+                )
             missing = [name for name, value in required.items() if not value]
             if missing:
                 raise ValueError(f"Missing production configuration: {', '.join(missing)}")

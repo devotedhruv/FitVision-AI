@@ -3,12 +3,14 @@ import 'package:fitvision_ai/core/config/app_config.dart';
 import 'package:fitvision_ai/core/errors/app_exception.dart';
 import 'package:fitvision_ai/core/errors/failure.dart';
 import 'package:fitvision_ai/features/authentication/presentation/auth_view_model.dart';
+import 'package:fitvision_ai/features/authentication/data/clerk_auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ApiClient {
   ApiClient(
     AppConfig config, {
     String? Function()? accessTokenProvider,
+    this.asyncAccessTokenProvider,
     Dio? dio,
   }) : _accessTokenProvider = accessTokenProvider ?? (() => null),
        _dio =
@@ -24,8 +26,9 @@ class ApiClient {
            ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final token = _accessTokenProvider();
+        onRequest: (options, handler) async {
+          final token =
+              await asyncAccessTokenProvider?.call() ?? _accessTokenProvider();
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
@@ -37,6 +40,7 @@ class ApiClient {
 
   final Dio _dio;
   final String? Function() _accessTokenProvider;
+  final Future<String?> Function()? asyncAccessTokenProvider;
 
   Future<Map<String, dynamic>> getJson(String path) async {
     try {
@@ -128,10 +132,13 @@ class ApiClient {
   }
 }
 
-final apiClientProvider = Provider<ApiClient>(
-  (ref) => ApiClient(
+final apiClientProvider = Provider<ApiClient>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return ApiClient(
     ref.watch(appConfigProvider),
-    accessTokenProvider: () =>
-        ref.read(authRepositoryProvider).currentAccessToken,
-  ),
-);
+    accessTokenProvider: () => repository.currentAccessToken,
+    asyncAccessTokenProvider: repository is RefreshingTokenRepository
+        ? (repository as RefreshingTokenRepository).getAccessToken
+        : null,
+  );
+});
