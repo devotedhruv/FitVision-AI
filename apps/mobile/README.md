@@ -4,15 +4,11 @@
 
 Running requires precise foreground location and Android notification permission. Tracking is started only from Running Setup. Generate Drift schema v2 with `dart run build_runner build`, then run `flutter analyze` and `flutter test`. Pending runs are visible in `sync_queue_items` with entity type `running_session`.
 
-The live route uses Google Maps and Android's fused high-accuracy location
-provider. Enable **Maps SDK for Android** in Google Cloud, restrict the key to
-the Android application ID `com.fitvisionai.fitvision_ai` plus the signing
-certificate SHA-1, and add this untracked entry to
-`android/local.properties`:
-
-```properties
-MAPS_API_KEY=YOUR_ANDROID_MAPS_API_KEY
-```
+The live route uses `flutter_map` with OpenStreetMap tiles and Android's fused
+high-accuracy location provider. No Google Maps API key or billing account is
+required. The map includes OpenStreetMap attribution; production deployments
+must follow the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+and should use an appropriate tile provider or self-hosted tiles at scale.
 
 The app accepts only accurate, plausible points. Rejected points do not change
 distance or the polyline, and a new polyline segment begins after resume so

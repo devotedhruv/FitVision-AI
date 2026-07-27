@@ -1,93 +1,137 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../domain/models/location_point.dart';
 
 class RouteMap extends StatefulWidget {
-  const RouteMap({required this.points, super.key});
+  const RouteMap({
+    required this.points,
+    this.expand = false,
+    this.statusMessage,
+    super.key,
+  });
 
   final List<LocationPoint> points;
+  final bool expand;
+  final String? statusMessage;
 
   @override
   State<RouteMap> createState() => _RouteMapState();
 }
 
 class _RouteMapState extends State<RouteMap> {
-  GoogleMapController? _controller;
+  final MapController _controller = MapController();
   bool _followLocation = true;
+  bool _mapReady = false;
   bool _programmaticMove = false;
 
   List<LocationPoint> get _accepted =>
       widget.points.where((point) => point.accepted).toList(growable: false);
 
+  LocationPoint? get _latest =>
+      widget.points.isEmpty ? null : widget.points.last;
+
   @override
   void didUpdateWidget(covariant RouteMap oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_followLocation &&
-        _accepted.length > _acceptedCount(oldWidget.points)) {
+    if (_followLocation && widget.points.length > oldWidget.points.length) {
       unawaited(_moveToLatest());
     }
   }
 
   @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final accepted = _accepted;
-    final latest = accepted.isEmpty
+    final latestPoint = _latest;
+    final markerPoint = accepted.isEmpty ? latestPoint : accepted.last;
+    final center = latestPoint == null
         ? const LatLng(27.7172, 85.3240)
-        : _latLng(accepted.last);
-    final routePolylines = _routePolylines(accepted, context);
+        : _latLng(latestPoint);
+    final polylines = _routePolylines(accepted, context);
 
     return RepaintBoundary(
       child: SizedBox(
-        height: 260,
+        height: widget.expand ? double.infinity : 260,
         child: Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(target: latest, zoom: 17),
-              myLocationButtonEnabled: false,
-              myLocationEnabled: false,
-              compassEnabled: true,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
-              markers: accepted.isEmpty
-                  ? const {}
-                  : {
+            FlutterMap(
+              mapController: _controller,
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: 17,
+                onMapReady: () {
+                  _mapReady = true;
+                  if (latestPoint != null) unawaited(_moveToLatest());
+                },
+                onPositionChanged: (_, hasGesture) {
+                  if (hasGesture && !_programmaticMove && _followLocation) {
+                    setState(() => _followLocation = false);
+                  }
+                },
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.fitvisionai.fitvision_ai',
+                ),
+                if (polylines.isNotEmpty) PolylineLayer(polylines: polylines),
+                if (markerPoint != null)
+                  MarkerLayer(
+                    markers: [
                       Marker(
-                        markerId: const MarkerId('current-location'),
-                        position: latest,
-                        infoWindow: const InfoWindow(title: 'Current location'),
+                        point: _latLng(markerPoint),
+                        width: 44,
+                        height: 44,
+                        child: Tooltip(
+                          message: markerPoint.accepted
+                              ? 'Current location'
+                              : 'Accuracy: ${markerPoint.horizontalAccuracy.toStringAsFixed(0)}m',
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1976F3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 4),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black26, blurRadius: 5),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    },
-              polylines: routePolylines,
-              onMapCreated: (controller) {
-                _controller = controller;
-                if (accepted.isNotEmpty) unawaited(_moveToLatest());
-              },
-              onCameraMoveStarted: () {
-                if (!_programmaticMove && _followLocation) {
-                  setState(() => _followLocation = false);
-                }
-              },
+                    ],
+                  ),
+                RichAttributionWidget(
+                  attributions: [
+                    TextSourceAttribution('OpenStreetMap contributors'),
+                  ],
+                ),
+              ],
             ),
             if (accepted.isEmpty)
-              const Positioned.fill(
+              Positioned.fill(
                 child: IgnorePointer(
                   child: Center(
                     child: Card(
+                      color: latestPoint == null
+                          ? null
+                          : const Color(0xFF132522),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
                         ),
-                        child: Text('Waiting for an accurate GPS fix…'),
+                        child: Text(
+                          latestPoint == null
+                              ? (widget.statusMessage ??
+                                    'Waiting for a GPS location…')
+                              : 'GPS accuracy: ${latestPoint.horizontalAccuracy.toStringAsFixed(0)}m — move outdoors',
+                          style: latestPoint == null
+                              ? null
+                              : const TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
@@ -99,7 +143,7 @@ class _RouteMapState extends State<RouteMap> {
               child: FloatingActionButton.small(
                 heroTag: null,
                 tooltip: 'Recenter route map',
-                onPressed: accepted.isEmpty
+                onPressed: latestPoint == null
                     ? null
                     : () {
                         setState(() => _followLocation = true);
@@ -114,17 +158,14 @@ class _RouteMapState extends State<RouteMap> {
     );
   }
 
-  int _acceptedCount(List<LocationPoint> points) =>
-      points.where((point) => point.accepted).length;
-
   LatLng _latLng(LocationPoint point) =>
       LatLng(point.latitude, point.longitude);
 
-  Set<Polyline> _routePolylines(
+  List<Polyline> _routePolylines(
     List<LocationPoint> accepted,
     BuildContext context,
   ) {
-    if (accepted.length < 2) return const {};
+    if (accepted.length < 2) return const [];
     final segments = <List<LatLng>>[[]];
     for (var index = 0; index < accepted.length; index++) {
       final point = accepted[index];
@@ -134,66 +175,31 @@ class _RouteMapState extends State<RouteMap> {
       segments.last.add(_latLng(point));
     }
     final color = Theme.of(context).colorScheme.primary;
-    return {
+    return [
       for (var index = 0; index < segments.length; index++)
         if (segments[index].length >= 2)
-          Polyline(
-            polylineId: PolylineId('accepted-running-route-$index'),
-            points: segments[index],
-            color: color,
-            width: 6,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap,
-            jointType: JointType.round,
-          ),
-    };
+          Polyline(points: segments[index], color: color, strokeWidth: 6),
+    ];
   }
 
   Future<void> _moveToLatest() async {
-    final controller = _controller;
-    final accepted = _accepted;
-    if (!mounted || controller == null || accepted.isEmpty) return;
+    final latest = _latest;
+    if (!mounted || !_mapReady || latest == null) return;
     _programmaticMove = true;
     try {
-      if (accepted.length == 1) {
-        await controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: _latLng(accepted.last), zoom: 17),
-          ),
-        );
+      final accepted = _accepted;
+      if (accepted.length <= 1) {
+        _controller.move(_latLng(latest), 17);
       } else {
-        final bounds = _bounds(accepted);
-        await controller.animateCamera(
-          CameraUpdate.newLatLngBounds(bounds, 48),
+        final bounds = LatLngBounds.fromPoints(
+          accepted.map(_latLng).toList(growable: false),
+        );
+        _controller.fitCamera(
+          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48)),
         );
       }
     } finally {
       _programmaticMove = false;
     }
-  }
-
-  LatLngBounds _bounds(List<LocationPoint> points) {
-    var minLat = points.first.latitude;
-    var maxLat = minLat;
-    var minLng = points.first.longitude;
-    var maxLng = minLng;
-    for (final point in points.skip(1)) {
-      if (point.latitude < minLat) minLat = point.latitude;
-      if (point.latitude > maxLat) maxLat = point.latitude;
-      if (point.longitude < minLng) minLng = point.longitude;
-      if (point.longitude > maxLng) maxLng = point.longitude;
-    }
-    if (minLat == maxLat) {
-      minLat -= 0.00005;
-      maxLat += 0.00005;
-    }
-    if (minLng == maxLng) {
-      minLng -= 0.00005;
-      maxLng += 0.00005;
-    }
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
   }
 }

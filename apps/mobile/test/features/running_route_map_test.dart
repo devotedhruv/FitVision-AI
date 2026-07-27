@@ -1,8 +1,9 @@
 import 'package:fitvision_ai/features/running/domain/models/location_point.dart';
 import 'package:fitvision_ai/features/running/presentation/widgets/route_map.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 LocationPoint routePoint(
   int sequence,
@@ -41,9 +42,12 @@ void main() {
       ),
     );
 
-    final map = tester.widget<GoogleMap>(find.byType(GoogleMap));
-    expect(map.markers.single.position, const LatLng(27.7173, 85.3241));
-    expect(map.polylines.single.points, const [
+    final markerLayer = tester.widget<MarkerLayer>(find.byType(MarkerLayer));
+    expect(markerLayer.markers.single.point, const LatLng(27.7173, 85.3241));
+    final polylineLayer = tester.widget<PolylineLayer>(
+      find.byType(PolylineLayer),
+    );
+    expect(polylineLayer.polylines.single.points, const [
       LatLng(27.7172, 85.3240),
       LatLng(27.7173, 85.3241),
     ]);
@@ -65,8 +69,13 @@ void main() {
       ),
     );
 
-    final map = tester.widget<GoogleMap>(find.byType(GoogleMap));
-    expect(map.polylines, hasLength(2));
-    expect(map.polylines.every((line) => line.points.length == 2), isTrue);
+    final polylineLayer = tester.widget<PolylineLayer>(
+      find.byType(PolylineLayer),
+    );
+    expect(polylineLayer.polylines, hasLength(2));
+    expect(
+      polylineLayer.polylines.every((line) => line.points.length == 2),
+      isTrue,
+    );
   });
 }

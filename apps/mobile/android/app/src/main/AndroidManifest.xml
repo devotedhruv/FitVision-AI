@@ -11,9 +11,6 @@
         android:label="FitVision AI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
         <service android:name=".RunningLocationService" android:exported="false" android:foregroundServiceType="location" android:stopWithTask="false" />
         <activity
             android:name=".MainActivity"

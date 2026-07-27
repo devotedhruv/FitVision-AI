@@ -25,78 +25,109 @@ class _State extends ConsumerState<RunningSetupView> {
     final vm = ref.watch(runningViewModelProvider);
     final precise =
         vm.permission == LocationPermissionState.foregroundGrantedPrecise;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Running setup')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(AppRadius.extraLarge),
-            ),
-            child: Column(
-              children: [
-                const Icon(Icons.directions_run, size: 72),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Ready for your next run?',
-                  style: AppTypography.pageTitle(context),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                const Text(
-                  'FitVision uses precise location only during a run to measure distance and keep tracking with the screen off.',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) context.go('/dashboard');
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Back to dashboard',
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/dashboard'),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: ListTile(
-              leading: Icon(
-                precise ? Icons.check_circle : Icons.location_searching,
-                color: precise
-                    ? Theme.of(context).colorScheme.primary
-                    : AppColors.warning,
+          title: const Text('Running setup'),
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(AppRadius.extraLarge),
               ),
-              title: Text(_permission(vm.permission)),
-              subtitle: Text(
-                vm.message ??
-                    'Your route is stored on this device before synchronization.',
+              child: Column(
+                children: [
+                  const Icon(Icons.directions_run, size: 72),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Ready for your next run?',
+                    style: AppTypography.pageTitle(context),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  const Text(
+                    'FitVision uses precise location only during a run to measure distance and keep tracking with the screen off.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
-          ),
-          if (!precise)
-            FilledButton.icon(
-              onPressed: vm.busy ? null : vm.requestLocation,
-              icon: const Icon(Icons.my_location),
-              label: const Text('Enable precise location'),
+            const SizedBox(height: AppSpacing.lg),
+            Card(
+              child: ListTile(
+                leading: Icon(
+                  precise ? Icons.check_circle : Icons.location_searching,
+                  color: precise
+                      ? Theme.of(context).colorScheme.primary
+                      : AppColors.warning,
+                ),
+                title: Text(_permission(vm.permission)),
+                subtitle: Text(
+                  vm.message ??
+                      'Your route is stored on this device before synchronization.',
+                ),
+              ),
             ),
-          if (vm.permission == LocationPermissionState.permanentlyDenied ||
-              vm.permission ==
-                  LocationPermissionState.foregroundGrantedApproximate)
-            TextButton(
-              onPressed: vm.openSettings,
-              child: const Text('Open settings'),
-            ),
-          if (precise)
-            FilledButton.icon(
-              onPressed: vm.busy
-                  ? null
-                  : () async {
-                      await vm.start();
-                      if (context.mounted &&
-                          vm.status == RunningStatus.running) {
-                        context.push('/running/live');
-                      }
-                    },
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Start run'),
-            ),
-        ],
+            if (!precise)
+              FilledButton.icon(
+                onPressed: vm.busy ? null : vm.requestLocation,
+                icon: const Icon(Icons.my_location),
+                label: const Text('Enable precise location'),
+              ),
+            if (vm.permission == LocationPermissionState.permanentlyDenied ||
+                vm.permission ==
+                    LocationPermissionState.foregroundGrantedApproximate)
+              TextButton(
+                onPressed: vm.openSettings,
+                child: const Text('Open settings'),
+              ),
+            if (precise &&
+                (vm.status == RunningStatus.ready ||
+                    vm.status == RunningStatus.paused ||
+                    vm.status == RunningStatus.running))
+              FilledButton.icon(
+                onPressed: vm.busy
+                    ? null
+                    : () async {
+                        if (vm.status == RunningStatus.paused ||
+                            vm.status == RunningStatus.running) {
+                          if (context.mounted) context.push('/running/live');
+                          return;
+                        }
+                        await vm.start();
+                        if (context.mounted &&
+                            vm.status == RunningStatus.running) {
+                          context.push('/running/live');
+                        }
+                      },
+                icon: Icon(
+                  vm.status == RunningStatus.paused ||
+                          vm.status == RunningStatus.running
+                      ? Icons.directions_run
+                      : Icons.play_arrow,
+                ),
+                label: Text(
+                  vm.status == RunningStatus.paused ||
+                          vm.status == RunningStatus.running
+                      ? 'Continue run'
+                      : 'Start run',
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

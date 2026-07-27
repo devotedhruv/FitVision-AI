@@ -13,6 +13,7 @@ import 'package:fitvision_ai/shared/widgets/loading_indicator.dart';
 import 'package:fitvision_ai/shared/widgets/section_header.dart';
 import 'package:fitvision_ai/shared/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,31 +29,58 @@ class DashboardView extends ConsumerWidget {
     final greetingName = displayName != null && displayName.isNotEmpty
         ? displayName
         : authUser?.resolvedDisplayName ?? 'Athlete';
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            tooltip: 'Open profile',
-            onPressed: () => context.go('/profile'),
-            icon: const Icon(Icons.account_circle_outlined),
-          ),
-        ],
-      ),
-      body: summary.when(
-        loading: () => const LoadingIndicator(label: 'Loading dashboard'),
-        error: (error, stack) => ErrorView(
-          message: 'We could not load the demo dashboard.',
-          actionLabel: 'Retry',
-          onRetry: () => ref.invalidate(dashboardSummaryProvider),
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmExit(context);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Home'),
+          actions: [
+            IconButton(
+              tooltip: 'Open profile',
+              onPressed: () => context.go('/profile'),
+              icon: const Icon(Icons.account_circle_outlined),
+            ),
+          ],
         ),
-        data: (data) => _DashboardContent(
-          summary: data,
-          displayName: greetingName,
-          onRefresh: () async => ref.refresh(dashboardSummaryProvider.future),
+        body: summary.when(
+          loading: () => const LoadingIndicator(label: 'Loading dashboard'),
+          error: (error, stack) => ErrorView(
+            message: 'We could not load the demo dashboard.',
+            actionLabel: 'Retry',
+            onRetry: () => ref.invalidate(dashboardSummaryProvider),
+          ),
+          data: (data) => _DashboardContent(
+            summary: data,
+            displayName: greetingName,
+            onRefresh: () async => ref.refresh(dashboardSummaryProvider.future),
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _confirmExit(BuildContext context) async {
+    final exit = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Exit FitVision AI?'),
+        content: const Text('Do you want to exit this app?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('No'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Yes, exit'),
+          ),
+        ],
+      ),
+    );
+    if (exit == true && context.mounted) await SystemNavigator.pop();
   }
 }
 

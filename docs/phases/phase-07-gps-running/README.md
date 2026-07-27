@@ -4,14 +4,14 @@ Phase 7 adds an explicit, user-started outdoor run flow. Accepted GPS samples ar
 
 The app never collects location before Start Run or after Finish. Completed runs synchronize through the Phase 6 queue using stable client UUIDs.
 
-## Google Maps configuration
+## Map configuration
 
-The route view uses `google_maps_flutter`; Android location sampling uses the
-Google Play services fused high-accuracy provider. Enable Maps SDK for Android
-and provide `MAPS_API_KEY` through `apps/mobile/android/local.properties` or the
-build environment. Never commit the key. Restrict it to the Android package and
-the release/debug signing certificate fingerprints used for the relevant
-builds.
+The route view uses `flutter_map` with OpenStreetMap tiles. Android location
+sampling continues to use the Google Play services fused high-accuracy
+provider; this is independent of the map renderer. No Google Maps API key or
+billing account is required. The map includes OpenStreetMap attribution. For
+production traffic, use an approved tile provider or self-hosted tiles and
+follow the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
 
 Only points accepted by the deterministic GPS filter appear on the map. A
 zero-distance segment anchor identifies the first fix and every post-resume
