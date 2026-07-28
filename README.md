@@ -1,70 +1,290 @@
-# FitVision AI
+<div align="center">
 
-FitVision AI is an Android-first mobile-system project for future on-device exercise pose monitoring and GPS running tracking. The repository contains the complete Phase 0 requirements plus implemented Flutter and FastAPI Phase 1 foundations.
+# 🏋️‍♂️ FitVision AI
 
-**Phase 0 completed — planning and requirements documented. Application implementation has not started.**
+### On-device pose monitoring & GPS running tracking — built Android-first
 
-The statement above records the Phase 0 completion baseline. Since that milestone, separate Phase 1 backend-foundation work has been added to this repository; the current implementation status is described immediately below.
+**No raw video leaves your phone. No AI pretending to be a doctor. Just honest engineering.**
 
-> **Current status:** Phase 8 unified history and deterministic analytics are implemented on
-> top of Phase 5, with Drift SQLite persistence, crash-safe timers, local
-> history, a persistent retry queue and idempotent authenticated server sync.
-> Outdoor runs use precise user-consented GPS, an Android location foreground service, Drift checkpoints, deterministic filtering and local-first results.
-> Completed workouts and runs now feed offline filters, calendar summaries, weighted pace, valid-form trends and explainable rule-coded insights without generative AI.
+![Status](https://img.shields.io/badge/Status-Phase%208%20In%20Progress-orange?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Android--first-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-3.44.7-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![License](https://img.shields.io/badge/Docs-Phase%200%20Complete-informational?style=for-the-badge)
 
-The intended completion statement—“Phase 1 completed — Flutter and FastAPI foundations are operational”—is **not yet true**. Authentication, database, AI pose estimation, exercise tracking, GPS tracking, and final UI are not implemented.
+</div>
 
-## Problem Being Solved
+---
 
-Manual rep counting is distracting and unreliable, unsupervised exercise offers little immediate form feedback, wearables generally do not evaluate camera-observed form, and strength/running records are frequently fragmented. FitVision AI plans to address these gaps without uploading raw workout video by default and without presenting automated feedback as medical advice.
+## ⚠️ Reality Check First
 
-## Planned Features and MVP
+> 📋 **Phase 0 completed** — planning & requirements are fully documented.
+> 🚧 **Phase 1 → 8 backend/mobile foundations** are implemented on top of that baseline.
+> ❌ **Not yet implemented:** production auth, final AI pose estimation UX, full GPS running UI, final polished UI.
 
-- On-device pose landmarks, full-transition rep counting, and rule-based form feedback.
-- **MVP exercises:** squats, biceps curls, and push-ups.
-- **Extended scope:** lunges and planks after MVP validation.
-- Running duration, route, distance, current/average speed, and current/average pace.
-- Pause/resume/finish controls for workouts and runs.
-- Local-first persistence, idempotent synchronization, combined history, and rule-based analytics.
-- Authentication, profile/unit settings, permission recovery, user-data isolation, and deletion.
-
-## Planned Technology Stack
-
-| Layer | Planned technology |
+| ✅ What's real today | 🔜 What's still ahead |
 |---|---|
-| Mobile | Flutter and Dart, Android-first |
-| Pose integration | MediaPipe Pose Landmarker via Kotlin and Pigeon or typed platform channels |
-| Exercise logic | Versioned, rule-based state machines |
-| Local data | SQLite with Drift |
-| API | FastAPI REST service |
-| Identity/cloud data | Supabase Auth and PostgreSQL through Supabase |
-| Running | Android location services and a maps provider (selection pending) |
-| Delivery | Docker and GitHub Actions in later phases |
+| Drift SQLite persistence & crash-safe timers | Real Supabase auth in production |
+| Local-first history + idempotent server sync | Final camera/pose UX polish |
+| GPS foreground service + deterministic filtering | Live route + maps provider selection |
+| Offline filters, calendar summaries, weighted pace | Lunges & planks (post-MVP) |
+| Rule-coded insights (no generative AI) | End-to-end device validation |
 
-## High-Level Architecture
+---
 
-Camera frames are processed on the device. Flutter use cases coordinate the native MediaPipe bridge, exercise engine, GPS service, local database, and offline queue. Only structured session/profile/route data is synchronized to FastAPI, which applies business and ownership rules and accesses PostgreSQL; Supabase Auth supplies identity. See the architecture diagram below for boundaries.
+## 📚 Table of Contents
 
-## Phase Roadmap
+- [🧠 The Problem](#-the-problem)
+- [✨ Planned Features & MVP](#-planned-features--mvp)
+- [🧰 Tech Stack](#-tech-stack)
+- [🏗️ Architecture Diagram](#️-architecture-diagram)
+- [🔄 User Flow](#-user-flow)
+- [🗄️ Conceptual Data Model (ERD)](#️-conceptual-data-model-erd)
+- [🗺️ Phase Roadmap](#️-phase-roadmap)
+- [📁 Repository Structure](#-repository-structure)
+- [🚀 Quick Start Guide](#-quick-start-guide)
+- [🧪 Testing & Validation](#-testing--validation)
+- [🔐 Environment Configuration](#-environment-configuration)
+- [📱 Phase 4: Running the Camera Build](#-phase-4-running-the-camera-build)
+- [🧩 Phase 5 & 6 Checks](#-phase-5--6-checks)
+- [📖 Documentation Index](#-documentation-index)
+- [👥 Team](#-team)
+- [🚧 Current Limitations](#-current-limitations)
+- [🛡️ Safety & Privacy](#️-safety--privacy)
+- [➡️ Next Phase](#️-next-phase)
 
-1. **Phase 0 — Planning and requirement analysis (complete):** scope, traceable requirements, acceptance baseline, risks, and diagrams. At this milestone, application implementation had not started.
-2. **Phase 1 — Project foundation (validation pending):** Flutter and FastAPI foundations, environment configuration, health contract, tests, and analysis are complete; debug APK validation remains unresolved.
-3. **Phase 2 — UI/UX, design system, application navigation and mock-data screens:** begins only after Phase 1 mobile acceptance checks pass.
-4. **Phase 4 — camera and pose foundation:** native CameraX preview, on-device
-   MediaPipe Pose Landmarker, Flutter skeleton, placement guidance, countdown
-   and lifecycle-safe controls.
-5. **Phase 5 — exercise analysis:** pure-Dart geometry, smoothing, confidence
-   filtering, full-cycle rep state machines, form feedback and live results.
-6. **Phase 6 — offline workouts and sync:** local session/rep storage,
-   recovery, reactive history and idempotent synchronization.
-7. **Later phases:** real GPS running, advanced
-   analytics, validation and delivery.
+---
 
-Roadmap phases after Phase 0 are planning guidance and may change through controlled review.
+## 🧠 The Problem
 
-## Current Repository Structure
+😤 **Manual rep counting** is distracting and unreliable.
+🙈 **Unsupervised exercise** gives zero real-time form feedback.
+⌚ **Wearables** track heart rate — not whether your squat form is safe.
+📉 **Strength & running records** end up scattered across apps and notebooks.
 
-```text
+**FitVision AI's answer:** on-device pose analysis and rule-based coaching — no raw video uploads by default, and never marketed as medical advice.
+
+---
+
+## ✨ Planned Features & MVP
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🏃 MVP Exercises
+- 🏋️ Squats
+- 💪 Biceps curls
+- 🙆 Push-ups
+
+**Extended (post-MVP):**
+- 🦵 Lunges
+- 🧘 Planks
+
+</td>
+<td width="50%" valign="top">
+
+### 🎯 Core Capabilities
+- 🎥 On-device pose landmarks
+- 🔢 Full-transition rep counting
+- 📐 Rule-based form feedback
+- ⏸️ Pause / resume / finish controls
+- 📍 Route, distance, speed & pace tracking
+- ☁️ Local-first sync, combined history
+- 🔐 Auth, profile/unit settings, data deletion
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | 🔧 Planned Technology |
+|---|---|
+| 📱 Mobile | Flutter & Dart, Android-first |
+| 🕺 Pose integration | MediaPipe Pose Landmarker via Kotlin + Pigeon / typed platform channels |
+| 🧮 Exercise logic | Versioned, rule-based state machines |
+| 💾 Local data | SQLite via Drift |
+| 🌐 API | FastAPI REST service |
+| 🔑 Identity / cloud data | Supabase Auth + PostgreSQL |
+| 🗺️ Running | Android location services + maps provider (TBD) |
+| 🚢 Delivery | Docker + GitHub Actions (later phases) |
+
+---
+
+## 🏗️ Architecture Diagram
+
+Camera frames stay **on-device**. Flutter coordinates the native MediaPipe bridge, exercise engine, GPS service, local DB, and offline sync queue. Only structured session/profile/route data reaches the backend.
+
+```mermaid
+flowchart TB
+    subgraph Device["📱 Android Device"]
+        CAM["🎥 Camera Feed<br/>(never uploaded)"]
+        MP["🕺 MediaPipe Pose<br/>Landmarker (Kotlin)"]
+        BRIDGE["🔌 Pigeon / Platform<br/>Channel Bridge"]
+        ENGINE["🧮 Exercise Engine<br/>(rule-based state machines)"]
+        GPS["📍 GPS Foreground<br/>Service"]
+        DB[("💾 Drift SQLite<br/>local-first store")]
+        QUEUE["📤 Persistent<br/>Retry Queue"]
+    end
+
+    subgraph Cloud["☁️ Backend"]
+        API["🌐 FastAPI REST"]
+        AUTH["🔐 Supabase Auth"]
+        PG[("🗄️ PostgreSQL<br/>via Supabase")]
+    end
+
+    CAM --> MP --> BRIDGE --> ENGINE
+    GPS --> ENGINE
+    ENGINE --> DB
+    DB --> QUEUE
+    QUEUE -- "idempotent sync<br/>(structured data only)" --> API
+    API --> AUTH
+    API --> PG
+
+    style CAM fill:#3DDC84,color:#000
+    style DB fill:#FFD166,color:#000
+    style API fill:#009688,color:#fff
+    style PG fill:#336791,color:#fff
+```
+
+---
+
+## 🔄 User Flow
+
+```mermaid
+flowchart LR
+    A["🔑 Sign in"] --> B["🏠 Home Dashboard"]
+    B --> C{"Choose activity"}
+    C -->|"🏋️ Workout"| D["📷 Camera Guide +<br/>Enable Camera"]
+    D --> E["🔢 Live Rep Counting<br/>+ Form Feedback"]
+    E --> F["⏸️ Pause / ▶️ Resume /<br/>⏹️ Finish"]
+    C -->|"🏃 Run"| G["📍 Grant GPS<br/>Permission"]
+    G --> H["🗺️ Live Route,<br/>Pace & Distance"]
+    H --> F
+    F --> I["💾 Save Locally<br/>(crash-safe)"]
+    I --> J["📤 Background Sync<br/>(retry queue)"]
+    J --> K["📊 Unified History<br/>& Insights"]
+
+    style D fill:#3DDC84,color:#000
+    style G fill:#3DDC84,color:#000
+    style K fill:#FFD166,color:#000
+```
+
+---
+
+## 🗄️ Conceptual Data Model (ERD)
+
+> 📝 Conceptual only — Phase 0 includes no migrations or production schema.
+
+```mermaid
+erDiagram
+    USER ||--o{ WORKOUT_SESSION : logs
+    USER ||--o{ RUN_SESSION : logs
+    USER ||--|| PROFILE : has
+    WORKOUT_SESSION ||--o{ EXERCISE_SET : contains
+    EXERCISE_SET ||--o{ REP_EVENT : records
+    RUN_SESSION ||--o{ ROUTE_POINT : contains
+    WORKOUT_SESSION ||--o{ SYNC_QUEUE_ITEM : queues
+    RUN_SESSION ||--o{ SYNC_QUEUE_ITEM : queues
+
+    USER {
+        uuid id
+        string email
+        datetime created_at
+    }
+    PROFILE {
+        uuid user_id
+        string unit_preference
+        string display_name
+    }
+    WORKOUT_SESSION {
+        uuid id
+        uuid user_id
+        string exercise_type
+        datetime started_at
+        datetime finished_at
+    }
+    EXERCISE_SET {
+        uuid id
+        uuid session_id
+        int rep_count
+        string form_status
+    }
+    REP_EVENT {
+        uuid id
+        uuid set_id
+        datetime timestamp
+        string classification
+    }
+    RUN_SESSION {
+        uuid id
+        uuid user_id
+        float distance_m
+        float avg_pace
+        datetime started_at
+    }
+    ROUTE_POINT {
+        uuid id
+        uuid run_id
+        float lat
+        float lng
+        datetime recorded_at
+    }
+    SYNC_QUEUE_ITEM {
+        uuid id
+        string entity_type
+        string status
+        int retry_count
+    }
+```
+
+---
+
+## 🗺️ Phase Roadmap
+
+```mermaid
+flowchart TD
+    P0["✅ Phase 0 — Planning &<br/>Requirements"] --> P1["🔧 Phase 1 — Project<br/>Foundation (validation pending)"]
+    P1 --> P2["🎨 Phase 2 — UI/UX,<br/>Design System, Mock Screens"]
+    P2 --> P4["📷 Phase 4 — Camera &<br/>Pose Foundation"]
+    P4 --> P5["🧮 Phase 5 — Exercise<br/>Analysis Engine"]
+    P5 --> P6["💾 Phase 6 — Offline<br/>Workouts & Sync"]
+    P6 --> P7["📍 Later — Real GPS<br/>Running & Analytics"]
+    P7 --> P8["📊 Later — Validation<br/>& Delivery"]
+
+    style P0 fill:#4CAF50,color:#fff
+    style P1 fill:#FFC107,color:#000
+    style P2 fill:#9E9E9E,color:#fff
+    style P4 fill:#9E9E9E,color:#fff
+    style P5 fill:#9E9E9E,color:#fff
+    style P6 fill:#9E9E9E,color:#fff
+    style P7 fill:#9E9E9E,color:#fff
+    style P8 fill:#9E9E9E,color:#fff
+```
+
+> ℹ️ Roadmap phases after Phase 0 are planning guidance and **may change through controlled review**.
+
+<details>
+<summary>📖 <b>Click for full phase descriptions</b></summary>
+
+- **Phase 0 — Planning** *(complete)*: scope, traceable requirements, acceptance baseline, risks, and diagrams.
+- **Phase 1 — Foundation** *(validation pending)*: Flutter & FastAPI foundations, environment config, health contract, tests, analysis complete; debug APK validation unresolved.
+- **Phase 2 — UI/UX**: design system, navigation, mock-data screens — begins after Phase 1 mobile acceptance checks pass.
+- **Phase 4 — Camera & Pose**: native CameraX preview, on-device MediaPipe Pose Landmarker, Flutter skeleton, placement guidance, countdown, lifecycle-safe controls.
+- **Phase 5 — Exercise Analysis**: pure-Dart geometry, smoothing, confidence filtering, full-cycle rep state machines, form feedback, live results.
+- **Phase 6 — Offline & Sync**: local session/rep storage, recovery, reactive history, idempotent synchronization.
+- **Later phases**: real GPS running, advanced analytics, validation and delivery.
+
+</details>
+
+---
+
+## 📁 Repository Structure
+
+```
 fitvision-ai/
 ├── docs/
 │   ├── diagrams/
@@ -90,14 +310,19 @@ fitvision-ai/
 └── README.md
 ```
 
-## Prerequisites
+---
 
-- Python 3.12 or newer and [`uv`](https://docs.astral.sh/uv/) for the backend.
-- Flutter 3.44.7/Dart 3.12.2 or compatible stable versions, Android SDK, Android command-line tools, accepted licenses, and ADB.
+## 🚀 Quick Start Guide
 
-## Backend Setup and Commands
+### ✅ Prerequisites
 
-From the repository root:
+- 🐍 **Python 3.12+** and **[uv](https://github.com/astral-sh/uv)** for the backend
+- 🐦 **Flutter 3.44.7 / Dart 3.12.2** (or compatible stable versions)
+- 🤖 Android SDK, Android command-line tools (licenses accepted), and ADB
+
+---
+
+### 1️⃣ Backend Setup
 
 ```bash
 cd services/api
@@ -105,24 +330,45 @@ UV_CACHE_DIR=/tmp/fitvision-uv-cache uv sync --all-groups
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Run validation from `services/api/`:
+🩺 Health check → `http://127.0.0.1:8000/api/v1/health`
+📖 Interactive API docs → `http://127.0.0.1:8000/docs`
+
+**Validate the backend** (run from `services/api/`):
 
 ```bash
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run ruff check .
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run pytest
 ```
 
-The health endpoint is `http://127.0.0.1:8000/api/v1/health`; interactive API documentation is at `http://127.0.0.1:8000/docs`.
+---
 
-## Environment Configuration
+### 2️⃣ Environment Configuration
 
-Backend configuration is loaded from environment variables or an ignored `services/api/.env`; [.env.example](.env.example) documents safe names and empty future placeholders. Never commit real credentials.
+🔒 Configuration loads from environment variables or an **ignored** `services/api/.env`.
+📄 `.env.example` documents safe variable names and empty placeholders.
 
-The planned Android emulator URL is `http://10.0.2.2:8000`. For a physical device, use `adb reverse tcp:8000 tcp:8000` and then `http://127.0.0.1:8000`. Local cleartext HTTP will be allowed only in the generated Android debug manifest; production will require HTTPS.
+> ⚠️ **Never commit real credentials.**
 
-## Mobile Setup and Commands
+| Scenario | Base URL |
+|---|---|
+| 🖥️ Android Emulator | `http://10.0.2.2:8000` |
+| 📱 Physical Device | `adb reverse tcp:8000 tcp:8000` → then `http://127.0.0.1:8000` |
+| 🏭 Production | HTTPS required |
 
-Ensure `/home/dhruv/development/flutter/bin` and `/home/dhruv/Android/Sdk/platform-tools` are on `PATH`, then run:
+Cleartext HTTP is allowed **only** in the generated Android debug manifest.
+
+---
+
+### 3️⃣ Mobile Setup
+
+Make sure these are on your `PATH`:
+
+```bash
+/home/dhruv/development/flutter/bin
+/home/dhruv/Android/Sdk/platform-tools
+```
+
+Then run:
 
 ```bash
 cd apps/mobile
@@ -132,13 +378,19 @@ flutter test
 flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
-For a physical device, first run `adb reverse tcp:8000 tcp:8000`, then use `API_BASE_URL=http://127.0.0.1:8000`. Local cleartext traffic is enabled only by the Android debug manifest; production configuration requires HTTPS.
+📱 **Physical device?**
 
-### Phase 4 camera run
+```bash
+adb reverse tcp:8000 tcp:8000
+# then use API_BASE_URL=http://127.0.0.1:8000
+```
 
-The Android app requests camera permission only after the user opens an
-exercise camera guide and presses **Enable camera**. It never requests
-microphone, storage or location permission in Phase 4.
+---
+
+## 📱 Phase 4: Running the Camera Build
+
+🎥 The app requests **camera permission only** after the user opens an exercise camera guide and taps **Enable camera**.
+🚫 It **never** requests microphone, storage, or location permission in Phase 4.
 
 ```bash
 cd apps/mobile
@@ -150,32 +402,38 @@ flutter run -d YOUR_DEVICE_ID \
   --dart-define=SUPABASE_PUBLISHABLE_KEY=PUBLIC_KEY
 ```
 
-The official `pose_landmarker_lite.task` model is checked in under
-`packages/pose_landmarker/android/src/main/assets/`. Its source and checksum
-are recorded in
-[`model-provenance.md`](docs/phases/phase-04-camera-pose-foundation/model-provenance.md).
-Debug builds show landmark indices, processed FPS and inference latency; release
-builds suppress debug data.
+📦 The official `pose_landmarker_lite.task` model ships under:
+`packages/pose_landmarker/android/src/main/assets/`
+🔎 Source & checksum recorded in `model-provenance.md`.
 
-Camera frames and raw video stay on-device and are neither uploaded nor saved
-by default. Phase 5 converts normalized landmarks into deterministic movement
-events; it does not persist raw pose coordinates.
+| Build type | Debug overlay |
+|---|---|
+| 🐛 Debug | Landmark indices, processed FPS, inference latency |
+| 🚀 Release | Debug data suppressed |
 
-### Phase 5 exercise-engine checks
+🔐 Camera frames and raw video stay **on-device** — never uploaded or saved by default.
+📐 Phase 5 converts normalized landmarks into deterministic movement events; it does **not** persist raw pose coordinates.
+
+---
+
+## 🧩 Phase 5 & 6 Checks
+
+### 🧮 Phase 5 — Exercise Engine
 
 ```bash
 dart format packages/exercise_engine
 dart analyze packages/exercise_engine
 dart test packages/exercise_engine
+
 cd apps/mobile
 flutter pub get
 flutter analyze
 flutter test
 ```
 
-See [Phase 5 documentation](docs/phases/phase-05-exercise-engine/README.md).
+📖 See Phase 5 documentation for details.
 
-### Phase 6 database and sync checks
+### 💾 Phase 6 — Database & Sync
 
 ```bash
 cd apps/mobile
@@ -184,83 +442,124 @@ flutter analyze
 flutter test
 ```
 
-Apply backend migrations before server sync:
+Apply backend migrations **before** server sync:
 
 ```bash
 cd services/api
 UV_CACHE_DIR=/tmp/fitvision-uv-cache uv run alembic upgrade head
 ```
 
-See [Phase 6 documentation](docs/phases/phase-06-workout-storage-sync/README.md).
+📖 See Phase 6 documentation for details.
 
-## Phase 0 Documentation
+---
 
-- [Problem statement](docs/phases/phase-00-planning/problem-statement.md)
-- [Scope](docs/phases/phase-00-planning/scope.md)
-- [User stories](docs/phases/phase-00-planning/user-stories.md)
-- [Functional requirements](docs/phases/phase-00-planning/functional-requirements.md)
-- [Non-functional requirements](docs/phases/phase-00-planning/non-functional-requirements.md)
-- [Supported exercises](docs/phases/phase-00-planning/supported-exercises.md)
-- [Acceptance criteria and Definition of Done](docs/phases/phase-00-planning/acceptance-criteria.md)
-- [Risk register](docs/phases/phase-00-planning/risks.md)
-- [Editable diagram sources](docs/diagrams/source/)
+## 🧪 Testing & Validation
 
-## Phase 1 Documentation
+| Component | Command |
+|---|---|
+| 🐍 Backend lint | `uv run ruff check .` |
+| 🐍 Backend tests | `uv run pytest` |
+| 🐦 Mobile analysis | `flutter analyze` |
+| 🐦 Mobile tests | `flutter test` |
+| 🧮 Exercise engine | `dart analyze` / `dart test` |
+| 💾 DB codegen | `dart run build_runner build --delete-conflicting-outputs` |
 
-- [Implementation summary](docs/phases/phase-01-foundation/implementation-summary.md)
-- [Setup guide](docs/phases/phase-01-foundation/setup-guide.md)
-- [Architecture decisions](docs/phases/phase-01-foundation/architecture-decisions.md)
-- [Validation report](docs/phases/phase-01-foundation/validation-report.md)
+---
 
-## Phase 2 Documentation
+## 📖 Documentation Index
 
-- [Core mobile experience implementation guide](docs/phases/phase-02-core-mobile-experience/implementation-guide.md)
+<table>
+<tr><td>
 
-## Diagrams
+**📋 Phase 0**
+- Problem statement
+- Scope
+- User stories
+- Functional requirements
+- Non-functional requirements
+- Supported exercises
+- Acceptance criteria & DoD
+- Risk register
+- Editable diagram sources
 
-### System architecture
+</td><td>
 
-![FitVision AI system architecture](docs/diagrams/system-architecture.png)
+**🔧 Phase 1**
+- Implementation summary
+- Setup guide
+- Architecture decisions
+- Validation report
 
-### User flow
+**🎨 Phase 2**
+- Core mobile experience guide
 
-![FitVision AI user flow](docs/diagrams/user-flow.png)
+</td></tr>
+</table>
 
-### Conceptual database ERD
+---
 
-![FitVision AI conceptual database ERD](docs/diagrams/database-erd.png)
+## 👥 Team
 
-The ERD is conceptual only; Phase 0 includes no migrations or production database schema.
+👤👤👤👤 This project is intended for a **four-person development team**.
 
-## Team
+> ℹ️ The proposal presentation was not available in the repository during Phase 0. Names and final responsibility assignments are **to be confirmed** from the proposal/project owner — not invented.
 
-This project is intended for a four-person development team. The proposal presentation was not available in the repository during Phase 0, so names and final responsibility assignments remain **to be confirmed from the proposal/project owner** rather than invented. Suggested responsibility areas are mobile/UX, pose/native integration, backend/data, and QA/DevOps, with cross-review to reduce single-person dependency.
+**Suggested responsibility areas** (cross-review encouraged to reduce single-person dependency):
 
-## Current Limitations
+| Area | Icon |
+|---|---|
+| Mobile / UX | 📱 |
+| Pose / Native Integration | 🕺 |
+| Backend / Data | 🗄️ |
+| QA / DevOps | 🧪 |
 
-- A real Supabase project and PostgreSQL target must be configured before
-  end-to-end authentication or database migration validation.
-- Workout, running, and analytics mobile screens remain mock/empty experiences;
-  Phase 3 supplies storage APIs but does not implement sensing or synchronization.
-- Running remains a clearly marked preview: Phase 4 adds no location
-  permission, real GPS or live route.
-- Pose inference is Android-only. Physical performance varies by device; consult
-  the Phase 4 performance report before claiming FPS/latency targets.
-- Thresholds, model performance, supported Android versions/devices, GPS filters, maps provider, and sync conflict details require Phase 1 decisions and empirical validation.
-- Only one user in supported views/conditions is planned for pose monitoring.
-- Automated cues may be wrong when landmarks are uncertain and are not a substitute for a qualified professional.
+---
 
-## Safety and Privacy
+## 🚧 Current Limitations
 
-FitVision AI is an automated fitness guidance and record-keeping concept, **not a medical diagnosis, injury diagnosis, rehabilitation, or emergency system**. Users should stop exercise when they experience pain or unsafe symptoms and seek qualified advice where appropriate. Pose inference is planned on-device; raw camera frames are not uploaded by default. Structured workout data and precise running routes are sensitive and must use explicit permissions, minimized collection, HTTPS, user-scoped authorization, and reliable deletion controls.
+- ☁️ A real **Supabase project & PostgreSQL target** must be configured before end-to-end auth or DB migration validation.
+- 🖼️ Workout, running, and analytics screens remain **mock/empty**; Phase 3 supplies storage APIs but not sensing/sync.
+- 🏃 Running is a **clearly marked preview** — Phase 4 adds no location permission, real GPS, or live route.
+- 🤖 Pose inference is **Android-only**; performance varies by device — consult the Phase 4 performance report before claiming FPS/latency targets.
+- 📊 Thresholds, model performance, supported Android versions/devices, GPS filters, maps provider, and sync-conflict details require **Phase 1 decisions and empirical validation**.
+- 👤 Only **one user** in supported views/conditions is planned for pose monitoring.
+- ⚠️ Automated cues may be wrong when landmarks are uncertain and are **not a substitute for a qualified professional**.
 
-## Next Phase
+---
 
-Phase 3 implements Supabase authentication, FastAPI authorization, PostgreSQL
-models, Alembic migrations, RLS policies, and core user-scoped APIs. See
-[`docs/phases/phase-03-auth-backend-database/`](docs/phases/phase-03-auth-backend-database/)
-for setup, security, schema, API, and validation details.
+## 🛡️ Safety & Privacy
 
-The next delivery focus is physical-device calibration of Phase 5 thresholds
-and the later GPS/persistence work. Camera code remains independent of exercise
-rules.
+> 🩺 **FitVision AI is an automated fitness guidance and record-keeping concept — not a medical diagnosis, injury diagnosis, rehabilitation, or emergency system.**
+
+- 🛑 Stop exercising if you experience pain or unsafe symptoms; seek qualified advice where appropriate.
+- 🎥 Pose inference is planned **on-device**; raw camera frames are **not uploaded by default**.
+- 🔐 Structured workout data and precise running routes are sensitive and require:
+  - ✅ Explicit permissions
+  - ✅ Minimized data collection
+  - ✅ HTTPS
+  - ✅ User-scoped authorization
+  - ✅ Reliable deletion controls
+
+---
+
+## ➡️ Next Phase
+
+**Phase 3** implements:
+
+🔑 Supabase authentication • 🛡️ FastAPI authorization • 🗄️ PostgreSQL models • 🧬 Alembic migrations • 🔒 RLS policies • 🌐 Core user-scoped APIs
+
+📁 See `docs/phases/phase-03-auth-backend-database/` for setup, security, schema, API, and validation details.
+
+🎯 **Next delivery focus:** physical-device calibration of Phase 5 thresholds and the later GPS/persistence work. Camera code remains independent of exercise rules.
+
+---
+
+<div align="center">
+
+### 🏃‍♀️ Built with intention. Documented with honesty. 🏋️‍♂️
+
+![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Made with FastAPI](https://img.shields.io/badge/Made%20with-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![No Video Upload](https://img.shields.io/badge/Raw%20Video-Never%20Uploaded-success?style=flat-square)
+
+</div>
